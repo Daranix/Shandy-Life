@@ -20,7 +20,7 @@ module.exports = {
     rainLevel: 0.0,
     snowLevel: 0.0,
     timeScale: 1.0,
-    IPLs: [],
+    IPLs: ['shr_int'],
     interiors: [],
     capInteriors: true
   },

@@ -1,9 +1,10 @@
 /**
- * @overview The Godfivther
- * @author Jan "Waffle" C. edit: Daranix
+ * @overview GTA:Multiplayer Godfivther - Roleplay Mode
+ * @author "Daranix" & Jan "Waffle" C.
  * @copyright (c) GTA:Multiplayer [gta-mp.net]
  * @license https://master.gta-mp.net/LICENSE
  */
+
 "use strict";
 
 /*
@@ -26,21 +27,29 @@
  */
 
 //Data player vars
-global.pAdmin     = [];
-global.pLogged    = [];
+/*global.pAdmin     = [];
 global.pMoney     = [];
 global.pFaction   = [];
-global.pId        = [];
-global.pLicenses  = [[][]];
+global.pId        = [];*/
+//global.pLicenses  = [[],[]];
+global.PlayerInfo = [];
 
 //Other player variables
+global.pLogged    = [];
 global.ConfirmReg = [];
 global.ConfirmPwd = [];
 global.Registered = [];
 
 
 //Assoc faction ID to name
-global.FactionName = ["none","Police"];
+global.FactionName = ["none",
+                      "Police"];
+//Assoc license to a good name
+global.LicenseName = ["Drive license", 
+                      "Boat license", 
+                      "Truck license", 
+                      "Helicopter pilot license", 
+                      "Plane pilot license"];
 
 global.gm = {
   config:   require('./config.js'),
@@ -72,7 +81,7 @@ function main () {
   printf("Server started!");
   let updateInterval = gm.utility.minutes(1);
   printf("Player update interval: " + updateInterval + " miliseconds");
-  setInterval(function() { gm.events.updateAllPlayers(); }, updateInterval);
+  //setInterval(function() { gm.events.updateAllPlayers(); }, updateInterval);
 }
 
 main();

@@ -1,6 +1,6 @@
 /**
- * @overview The Godfivther: Events
- * @author Jan "Waffle" C. edit: Daranix
+ * @overview GTA:Multiplayer Godfivther - Roleplay: Events
+ * @author "Daranix" & Jan "Waffle" C.
  * @copyright (c) GTA:Multiplayer [gta-mp.net]
  * @license https://master.gta-mp.net/LICENSE
  */
@@ -91,8 +91,9 @@ Events.onChatCommand = (player, command) => {
 
   for (const command of commands) {
     if (command[0].toLowerCase() === commandName.toLowerCase()) {
+      //console.log("[CMD] " + player.name + ": /" + commandName);
       command[1](player, args);
-      console.log("[command] " + player.name + ": " + commandName);
+      
       return true;
     }
   }
@@ -107,11 +108,26 @@ Events.onChatCommand = (player, command) => {
 Events.onPlayerCreated = player => {
   
 
-  pAdmin[player.name]     = 0;
+  /*pAdmin[player.name]     = 0;
   pLogged[player.name]    = false;
   pFaction[player.name]   = 0;
-  pMoney[player.name]     = 0;
+  pMoney[player.name]     = 0;*/
+  pLogged[player.name]    = false;
   ConfirmReg[player.name] = false;
+
+  PlayerInfo[player.name] = {
+    id: 0,
+    adminlvl: 0,
+    faction: 0,
+    factionrank: 0,
+    licenses: {
+      car: false,
+      boat: false,
+      truck: false,
+      pilot_helicopter: false,
+      pilot_plane: false
+    },
+  };
 
   console.log("Player " + player.name + " has successfully joined the server.");
 
@@ -219,15 +235,19 @@ Events.onPlayerDestroyed = player => {
  * This event wasn't a GTA:MP native event
 */
 
-Events.onPlayerUpdate = (player) => {
+Events.onPlayerUpdate = (player, info) => {
+  let showInfo = info || true;
   let connection = gm.utility.dbConnect();
+  
+  let jsonString = JSON.stringify(PlayerInfo[player.name].licenses);
 
   connection.connect();
 
   let SQLQuery = "UPDATE users SET" +
-  " adminlvl=" + pAdmin[player.name] +
-  " ,faction=" + pFaction[player.name] +
-  " WHERE id = " + pId[player.name];
+  " adminlvl=" + PlayerInfo[player.name].adminlvl +
+  " ,faction=" + PlayerInfo[player.name].faction +
+  " ,licenses='" + jsonString + "'" +
+  " WHERE id = " + PlayerInfo[player.name].id;
 
   connection.query(SQLQuery, function(err) {
     if(err) {
@@ -236,7 +256,7 @@ Events.onPlayerUpdate = (player) => {
       console.log("[ERROR]: " + err)
       return true;
     } else {
-      console.log("player data of " + player.name + " has been updated");
+      if(showInfo) { console.log("player data of " + player.name + " has been updated"); }
       return false;
     }
   });
@@ -254,11 +274,40 @@ Events.updateAllPlayers = () => {
      {
       if(pLogged[player.name]) 
       {
-        Events.onPlayerUpdate(player);
+        Events.onPlayerUpdate(player, false);
       }
     }
 
     console.log("info of all players has been uploaded");
 
   }
+};
+
+Events.onPlayerLogin = (player, dbData) => {
+
+  /*let tempLicences = JSON.parse(dbData.licenses)
+
+  console.log("License car status: " + tempLicences.car);*/
+  console.log("dbData:");
+  console.log(dbData);
+  console.log("ID: " + dbData.id);
+  console.log("LICENSES: " + dbData.licenses);
+
+  let parsedLicenses = JSON.parse(dbData.licenses);
+
+  PlayerInfo[player.name] = {
+    id: dbData.id,
+    adminlvl: dbData.adminlvl,
+    faction: dbData.faction,
+    factionrank: dbData.factionrank,
+    licenses: parsedLicenses /*{
+      car: false,
+      boat: false,
+      truck: false,
+      pilot_helicopter: false,
+      pilot_plane: false
+    },*/
+  };
+
+  pLogged[player.name] = true;
 };

@@ -51,23 +51,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `posx` float NOT NULL,
   `posy` float NOT NULL,
   `posz` float NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
-
---
--- Volcado de datos para la tabla `users`
---
-
-INSERT INTO `users` (`id`, `name`, `password`, `adminlvl`, `faction`, `factionrank`, `posx`, `posy`, `posz`) VALUES
-(1, 'FakePlayer', '77794b158cee43c99fc4b3e7c13fd49e', 4, 1, 0, 0, 0, 0),
-(2, 'twp', '77794b158cee43c99fc4b3e7c13fd49e', 0, 0, 0, 0, 0, 0),
-(3, 'five', '77794b158cee43c99fc4b3e7c13fd49e', 3, 0, 0, 0, 0, 0),
-(4, 'three', '77794b158cee43c99fc4b3e7c13fd49e', 0, 0, 0, 0, 0, 0),
-(5, 'one', '77794b158cee43c99fc4b3e7c13fd49e', 0, 0, 0, 0, 0, 0),
-(6, 'nofive', '77794b158cee43c99fc4b3e7c13fd49e', 0, 0, 0, 0, 0, 0);
-
---
--- Índices para tablas volcadas
---
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 --
 -- Indices de la tabla `cars`
@@ -94,7 +78,7 @@ ALTER TABLE `cars`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

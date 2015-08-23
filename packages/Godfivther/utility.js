@@ -1,6 +1,6 @@
 /**
- * @overview The Godfivther: Utility File
- * @author Jan "Waffle" C. edit: Daranix 
+ * @overview GTA:Multiplayer Godfivther - Roleplay: Utility file
+ * @author "Daranix" & Jan "Waffle" C.
  * @copyright (c) GTA:Multiplayer [gta-mp.net]
  * @license https://master.gta-mp.net/LICENSE
  */
@@ -31,6 +31,7 @@ Utility.broadcastMessage = (faction, message, opt_color) => {
  * @return {Player} An array with the players found with the id or the name,
  *                  only contains the first one found if allowDuplicates was false, empty array if no player was found
  */
+ 
 Utility.getPlayer = (idOrName, opt_allowDuplicates, opt_caseSensitive) => {
   let allowDuplicates = opt_allowDuplicates || false;
   let caseSensitive = opt_caseSensitive || false;
@@ -117,22 +118,41 @@ Utility.dbConnect = () => {
 
 Utility.ban = (player) => {
 	
-	let connection = gm.mysql.createConnection({
+	let connection = Utility.dbConnect(); /*gm.mysql.createConnection({
         host     : gm.config.mysql.host,
         user     : gm.config.mysql.user,
         password : gm.config.mysql.password,
         database : gm.config.mysql.database
-    });
+    });*/
 
 	connection.connect();
 
-	let SQLQuery = "UPDATE users SET banned = 1 WHERE id = " + pId[player.name];
+	let SQLQuery = "UPDATE users SET banned = 1 WHERE id = " + PlayerInfo[player.name].id;
 	printf(player.name + "has been banned");
 	connection.query(SQLQuery);
 
 	connection.end();
 
-}
+};
+
+Utility.unban = (player) => {
+	
+	let connection = Utility.dbConnect(); /*gm.mysql.createConnection({
+        host     : gm.config.mysql.host,
+        user     : gm.config.mysql.user,
+        password : gm.config.mysql.password,
+        database : gm.config.mysql.database
+    });*/
+
+	connection.connect();
+
+	let SQLQuery = "UPDATE users SET banned = 0 WHERE id = " + PlayerInfo[player.name].id;
+	printf(player.name + "has been unbanned");
+	connection.query(SQLQuery);
+
+	connection.end();
+
+};
 
 /**
  * Broadcasts a Message to all Players in faction ID.
@@ -143,7 +163,7 @@ Utility.ban = (player) => {
 
 Utility.factionMessage = (faction, message, opt_color) => {
   for (let player of g_players) {
-  	if(pFaction[player.name] == faction) {
+  	if(PlayerInfo[player.name].faction == faction) {
     	player.SendChatMessage(message, opt_color);
 	}
   }
@@ -167,12 +187,22 @@ Utility.minutes = (minutes) => {
 
 Utility.timestamp = () => {
 	let d = new Date();
-	let year = d.getYear();
+	let year = d.getFullYear();
 	let month = d.getMonth();
-	let day = d.getDay();
+	let day = d.getDate();
 	let hour = d.getHours();
 	let min = d.getMinutes();
 	let secs = d.getSeconds();
 	let time = "(" + day + "-" + month + "-" + year + " || " + hour + ":" + min + ":" + secs + ")";
 	return time;
+};
+
+Utility.isInArray = (value, array) => {
+  //return array.indexOf(value) > -1;
+
+  let result = array.indexOf(value);
+
+  if(result >= 0) return true;
+  else return false;
+
 };

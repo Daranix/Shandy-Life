@@ -1,6 +1,6 @@
 /**
- * @overview GTA:Multiplayer Default Package: Commands
- * @author Jan "Waffle" C. edit: Daranix
+ * @overview GTA:Multiplayer Godfivther - Roleplay Mode: Commands
+ * @author "Daranix" & Jan "Waffle" C.
  * @copyright (c) GTA:Multiplayer [gta-mp.net]
  * @license https://master.gta-mp.net/LICENSE
  */
@@ -8,23 +8,18 @@
 let commands = module.exports = new Map();
 
 let red = new RGB(255, 59, 59);
+
 commands.set("help", (player) => {
-  let str = "List of available commands:<br /><table><thead><tr>";
+  player.SendChatMessage("List of commands: ");
   let i = 1;
   commands.forEach((_, key) => {
-    str += "<td>/" + key + "</td>";
-    if (i % 3 === 0) {
-      str += "</tr><tr>";
-    }
-    i++;
+    player.SendChatMessage(" /" + key);
   });
-  str = str.substr(0, str.length - 3) + "/table>";
-  player.SendChatMessage(str);
 });
 
 commands.set("broadcast", (player, args) => {
   //gm.utility.broadcastMessage("((BROADCAST)) " + player.name + ": " + args.join(" "));
-  if(pAdmin[player.name] < 1) {
+  if(PlayerInfo[player.name].adminlvl < 1) {
     return player.SendChatMessage("You don't have access to that command");
   }
 
@@ -34,7 +29,7 @@ commands.set("broadcast", (player, args) => {
 
 commands.set("goto", (player, args) => {
 
-  if(pAdmin[player.name] < 1) {
+  if(PlayerInfo[player.name].adminlvl < 1) {
     return player.SendChatMessage("You don't have access to that command");
   }
 
@@ -78,7 +73,7 @@ commands.set("weather", (player, args) => {
 
 commands.set('giveMoney', (player, args) => {
   
-  if(pAdmin[player.name] <= 3) {
+  if(PlayerInfo[player.name].adminlvl <= 3) {
     return player.SendChatMessage("You don't have access to that command");
   }
 
@@ -181,8 +176,25 @@ commands.set("register", (player, args) => {
             player.SendChatMessage("You was been registered sucesfull");
             connection.query("SELECT id FROM users WHERE name = '" + player.name + "'", function(err2, results)
               {
-                pId[player.name]      = results[0].id;
+                //pId[player.name]      = results[0].id;
+                PlayerInfo[player.name].id = results[0].id;
+                /*PlayerInfo[player.name] = {
+                  id: results[0].id,
+                  adminlvl: 0,
+                  faction: 0,
+                  factionrank: 0,
+                  licenses: {
+                    car: false,
+                    boat: false,
+                    truck: false,
+                    pilot_helicopter: false,
+                    pilot_plane: false
+                  },
+                };*/
+
+                gm.events.onPlayerUpdate(player);
                 pLogged[player.name]  = true;
+
               });
             connection.end();
         } else {
@@ -232,13 +244,15 @@ commands.set("login", (player, args) => {
           player.Kick("You was banned from the server");
         }
 
-        pId[player.name]      = results[0].id;
-        pAdmin[player.name]   = results[0].adminlvl;
-        pFaction[player.name] = results[0].faction;
+        /*pId[player.name]      = results[0].id;
+        PlayerInfo[player.name].adminlvl   = results[0].adminlvl;
+        pFaction[player.name] = results[0].faction;*/
+
+        gm.events.onPlayerLogin(player, results[0]);
 
         console.log(results[0]);
-        pLogged[player.name] = true;
-        return player.SendChatMessage("ID: " + pId[player.name] + "\nAdminLvl: " + pAdmin[player.name]);
+        //pLogged[player.name] = true;
+        return true; // player.SendChatMessage("ID: " + pId[player.name] + "\nAdminLvl: " + PlayerInfo[player.name].adminlvl);
       } else {
         player.SendChatMessage("Incorrect password, please try again.")
       }
@@ -257,13 +271,18 @@ commands.set("hash", (player, args) => {
 });
 
 commands.set("stats", (player) => {
-  return player.SendChatMessage("ID: " + pId[player.name] + "\nAdminLevel: " + pAdmin[player.name]);
+  //return player.SendChatMessage("ID: " + PlayerInfo[player.name].id + "\nAdminLevel: " + PlayerInfo[player.name].adminlvl);
+  //return player.SendChatMessage(PlayerInfo[player.name]);
+
+  let stringJSON = JSON.stringify(PlayerInfo[player.name]);
+
+  player.SendChatMessage(stringJSON);
 });
 
 commands.set("kick", (player, args) => {
   
 
-  if(pAdmin[player.name] < 1) {
+  if(PlayerInfo[player.name].adminlvl < 1) {
     return player.SendChatMessage("You don't have access to that command");
   }
 
@@ -287,7 +306,7 @@ commands.set("kick", (player, args) => {
 
   let reason = args[1];
   gm.utility.broadcastMessage("[ADMIN] " + targets[0].name + " was kicked from the server by " + player.name + " reason: " + reason);
-  targets[0].Kick("[ADMIN] You were kicked from the Server by " + player.name + " reason: " + reason);
+  targets[0].Kick("[ADMIN] You was kicked from the Server by " + player.name + " reason: " + reason);
 
 });
 
@@ -297,7 +316,7 @@ commands.set("ban", (player, args) => {
     return player.SendChatMessage("USAGE: /ban [id or name] [Reason]", red);
   }
 
-  if(pAdmin[player.name] < 1) {
+  if(PlayerInfo[player.name].adminlvl < 1) {
     return player.SendChatMessage("You don't have access to that command");
   }
 
@@ -328,7 +347,7 @@ commands.set("ban", (player, args) => {
 
 commands.set("promoteadmin", (player, args) => {
   
-  if(pAdmin[player.name] < 3) {
+  if(PlayerInfo[player.name].adminlvl < 3) {
     return player.SendChatMessage("You don't have access to that command");
   }
 
@@ -342,7 +361,7 @@ commands.set("promoteadmin", (player, args) => {
     player.SendChatMessage("Admin Level must be a number")
   }
 
-  let targets = gm.utility.getPlayer(args[0], true);
+  let targets = gm.utility.getPlayer(args[0], false);
 
   if (targets.length === 0) {
     return player.SendChatMessage("Unknown Target.", red);
@@ -361,7 +380,7 @@ commands.set("promoteadmin", (player, args) => {
   }
 
 
-  pAdmin[targets[0].name] = adminlvl;
+  PlayerInfo[targets[0].name].adminlvl = adminlvl;
 
   if(!gm.events.onPlayerUpdate(player)) {
     player.SendChatMessage("[ADMIN] You promoted " + targets[0].name + " to admin level: " + adminlvl);
@@ -374,7 +393,7 @@ commands.set("promoteadmin", (player, args) => {
 
 commands.set("promotefaction", (player, args) => {
   
-  if(pAdmin[player.name] < 3) {
+  if(PlayerInfo[player.name].adminlvl < 3) {
     return player.SendChatMessage("You don't have access to that command");
   }
 
@@ -407,7 +426,7 @@ commands.set("promotefaction", (player, args) => {
   }
 
 
-  pFaction[targets[0].name] = factionid;
+  PlayerInfo[player.name].faction = factionid;
 
   if(!gm.events.onPlayerUpdate(player)) {
     player.SendChatMessage("[ADMIN] You promoted " + targets[0].name + " to faction id: " + factionid);
@@ -420,41 +439,116 @@ commands.set("promotefaction", (player, args) => {
 
 commands.set("f", (player,args) => {
   let message = "(( " + player.name + ": " + args.join(" ") + " ))";
-  if(pFaction[player.name] >= 1) {
-    gm.utility.factionMessage(pFaction[player.name], message, new RGB(255,255,0));
+  if(PlayerInfo[player.name].faction >= 1) {
+    gm.utility.factionMessage(PlayerInfo[player.name].faction, message, new RGB(255,255,0));
   } else {
     return player.SendChatMessage("You don't have a faction");
   }
 });
 
-/*commands.set("update", (player) => {
+commands.set("update", (player) => {
   gm.events.updateAllPlayers();
   console.log("Updated info of all players");
 });
 
-commands.set("intervaltest", (player) => {
+commands.set("licenses", (player) => {
 
-  let n = 0;
+  let licens = PlayerInfo[player.name].licenses;
+  let i = 0;
+  player.SendChatMessage("Licenses: ");
+  for(let type in licens) {
 
-  setInterval(function() {
-    
-    console.log(n);
-    n++;  
-  }, gm.utility.seconds(3));
-});
+    if(licens.hasOwnProperty(type))
+        //console.info(type + ": " + licens[type]); // value
+        //console.info(prop); // key name
+        if(licens[type] == true) {
+          player.SendChatMessage(" " + LicenseName[i]);
+        }
+    i++;
+  }
 
-commands.set("jsontest", (player) => {
-  
-  //player.SendChatMessage(license[player.name].car);
-  //license[player.name]["cars"];
+/*  let arrayLicenses = [];
+  //arrayLicenses.keys(jsonString);
+  console.log(Object.keys(PlayerInfo[player.name].licenses));
+  arrayLicenses = Object.keys(PlayerInfo[player.name].licenses);
+
+  let lcount = arrayLicenses.length;
+
+  console.log("Licenses count: " + lcount);*/
 
 });
 
 commands.set("giveLicense", (player, args) => {
   
-  let lname = args.join(" ");
-  pLiceses[player.name][lname] = true;
+  if(PlayerInfo[player.name].adminlvl < 3) {
+    return player.SendChatMessage("You don't have access to this command");
+  }
 
-  gm.utility.onPlayerUpdate(player);
+  let giveLicens = args[1];
 
-});*/
+  let valLicenses = [];
+  let nameLicenses = "";
+
+  valLicenses = Object.keys(PlayerInfo[player.name].licenses);
+
+  for(let i in valLicenses) {
+    //console.log(valLicenses[i]);
+    nameLicenses += valLicenses[i] + ", ";
+  }
+
+
+  if(giveLicens == null || giveLicens == "" || !gm.utility.isInArray(giveLicens, valLicenses)) {
+    player.SendChatMessage("Parameters: " + args[0] + " " + args[1]);
+    return player.SendChatMessage("/giveLicense [ID or name] [license: (" + nameLicenses + ")]");
+  }
+
+  let targets = gm.utility.getPlayer(args[0], true);
+
+  if (targets.length === 0) {
+    return player.SendChatMessage("Unknown Target.", red);
+  }
+  else if (targets.length > 1) {
+    let msg = "found multiple targets: ";
+    for (let p of targets) {
+      msg += p.name + ", ";
+    }
+    msg = msg.slice(0, msg.length - 2);
+    return player.SendChatMessage(msg, red);
+  }
+
+  if(!pLogged[targets[0].name]) {
+    return player.SendChatMessage("This user was not logged in");
+  }
+
+  // ---
+
+  PlayerInfo[targets[0].name].licenses[giveLicens] = true;
+
+  if(!gm.events.onPlayerUpdate(player)) {
+    player.SendChatMessage("[ADMIN] You given " + giveLicens + " to : " + targets[0].name);
+    targets[0].SendChatMessage("[ADMIN] You recieved license: " + giveLicens + " by " + player.name);
+  } else {
+    player.SendChatMessage("[ERROR] An error ocurred when trying to upload player info of " + targets[0].name);
+  }
+
+  //player.SendChatMessage("Command executed sucesfully");
+
+
+
+});
+
+commands.set("jsontest", (player) => {
+
+  let jsonString = JSON.stringify(PlayerInfo[player.name].licenses);
+
+
+  console.log(jsonString);
+  //console.log(PlayerInfo[player.name].adminlvl);
+  //infoLicenses[player.name].car = false;
+
+});
+
+commands.set("disconnect", (player) => {
+  player.Kick("Normal quit");
+});
+
