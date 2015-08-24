@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-08-2015 a las 00:31:47
+-- Tiempo de generación: 22-08-2015 a las 21:16:15
 -- Versión del servidor: 5.6.25
 -- Versión de PHP: 5.6.11
 
@@ -45,20 +45,13 @@ CREATE TABLE IF NOT EXISTS `users` (
   `id` int(11) NOT NULL,
   `name` varchar(18) NOT NULL,
   `password` text NOT NULL,
-  `money` int(11) NOT NULL DEFAULT '0',
   `adminlvl` int(11) NOT NULL DEFAULT '0',
   `faction` int(11) NOT NULL DEFAULT '0',
   `factionrank` int(11) NOT NULL DEFAULT '0',
-  `licenses` text NOT NULL,
-  `phone` int(11) NOT NULL DEFAULT '0',
   `posx` float NOT NULL,
   `posy` float NOT NULL,
   `posz` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Índices para tablas volcadas
---
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 --
 -- Indices de la tabla `cars`
@@ -85,7 +78,7 @@ ALTER TABLE `cars`
 -- AUTO_INCREMENT de la tabla `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

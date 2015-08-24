@@ -169,6 +169,14 @@ Utility.factionMessage = (faction, message, opt_color) => {
   }
 };
 
+Utility.adminMessage = (message, opt_color) => {
+  for (let player of g_players) {
+  	if(PlayerInfo[player.name].adminlvl >= 1) {
+    	player.SendChatMessage(message, opt_color);
+	}
+  }
+};
+
 Utility.proximityMessage = (radi, sender, message, opt_color) => {
 	for(let receptor of g_players) {
 		if(Utility.PlayerToPoint(radi, receptor, sender.position.x, sender.position.y, sender.position.z)) {
@@ -205,4 +213,84 @@ Utility.isInArray = (value, array) => {
   if(result >= 0) return true;
   else return false;
 
+};
+
+Utility.print = (msg) => {
+  let fmsg = Utility.timestamp() + " " + msg;
+  console.log(fmsg);
+  /*let f = gm.fs("./logs/general.txt");
+  f.write(fmsg+ "\n");
+  f.end();*/
+};
+
+Utility.generatePhoneNumber = () => {
+
+	let number 	= 0;
+	let numRows = 0;
+
+	let connection = Utility.dbConnect();
+
+	connection.connect();
+
+	do {
+
+		number = Math.floor(100000000 + Math.random() * 900000000);
+	    connection.query("SELECT phone FROM users WHERE phone = " + number, function(err, results) {
+	        numRows = results.length;
+	    });
+
+	} while (numRows >= 1);
+
+	connection.end();
+	return number;
+};
+
+let timerRing, gtimerRing;
+
+Utility.CallNumber = (caller, number) => {
+
+	let result = false;
+	
+	for (let called of g_players) 
+	{
+		if(PlayerInfo[called.name].phone == number) 
+		{
+    		called.SendChatMessage("Your phone is ringing (hang on with: /hangon)", new RGB(255,0,0));
+    		Utility.proximityMessage(100.0, caller, called.name + "'s phone is ringing");
+
+    		timerRing = setInterval(function() {
+    			called.SendChatMessage("Your phone is ringing", new RGB(255,0,0));
+    			Utility.proximityMessage(100.0, called, called.name + "'s phone is ringing");
+    		}, Utility.seconds(10));
+
+    		gtimerRing = setTimeout(function() { Utility.phoneRing(called, caller); }, Utility.minutes(1));
+    		result = true;
+    		break;
+    	}
+  	}
+
+  return result;
+};
+
+Utility.phoneRing = (called, caller) => {
+	called.SendChatMessage("You have not answered the call");
+	caller.SendChatMessage("Your call has not been answered");
+	pInCall[caller.name] = false;
+	pInCallNumber[caller.name] = 0;
+	pInCall[called.name] = false,
+	pInCallNumber[called.name] = 0;
+	clearInterval(timerRing);
+	clearTimeout(gtimerRing);
+
+};
+
+Utility.phoneTalkTo = (caller, message, opt_color) => {
+	
+	for(let called of g_players) 
+	{
+		if(PlayerInfo[called.name].phone == pInCallNumber[caller.name] && pInCall[called.name] == true && pInCallNumber[called.name] == PlayerInfo[caller.name].phone) 
+		{
+			called.SendChatMessage(message, opt_color);
+		}
+	}
 };

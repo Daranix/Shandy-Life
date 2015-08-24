@@ -1,9 +1,18 @@
-/**
- * @overview GTA:Multiplayer Default Package: Config File
- * @author Jan "Waffle" C.
- * @copyright (c) GTA:Multiplayer [gta-mp.net]
- * @license https://master.gta-mp.net/LICENSE
- */
+/*
+ 
+  _|_|_|  _|                                  _|                _|        _|      _|_|            
+_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|    
+  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|  
+      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|        
+_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|  
+                                                        _|                                        
+                                                    _|_| 
+ *****************************************************************
+ * @overview GTA:Multiplayer Godfivther - Roleplay: config  file *
+ * @author "Daranix" & Jan "Waffle" C.                           *
+ *****************************************************************
+*/
+
 "use strict";
 
 function interior() {

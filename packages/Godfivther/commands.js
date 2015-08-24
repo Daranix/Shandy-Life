@@ -1,8 +1,16 @@
-/**
- * @overview GTA:Multiplayer Godfivther - Roleplay Mode: Commands
- * @author "Daranix" & Jan "Waffle" C.
- * @copyright (c) GTA:Multiplayer [gta-mp.net]
- * @license https://master.gta-mp.net/LICENSE
+/*
+ 
+  _|_|_|  _|                                  _|                _|        _|      _|_|            
+_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|    
+  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|  
+      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|        
+_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|  
+                                                        _|                                        
+                                                    _|_| 
+ *****************************************************************
+ * @overview GTA:Multiplayer Godfivther - Roleplay: commands     *
+ * @author "Daranix" & Jan "Waffle" C.                           *
+ *****************************************************************
  */
 "use strict";
 let commands = module.exports = new Map();
@@ -18,7 +26,7 @@ commands.set("help", (player) => {
 });
 
 commands.set("broadcast", (player, args) => {
-  //gm.utility.broadcastMessage("((BROADCAST)) " + player.name + ": " + args.join(" "));
+
   if(PlayerInfo[player.name].adminlvl < 1) {
     return player.SendChatMessage("You don't have access to that command");
   }
@@ -122,7 +130,6 @@ commands.set("mypos", (player, args) => {
   let pposy = player.position.y;
   let pposz = player.position.z;
   let postotp = new Vector3f(3360.19, -4849.67, 111.8)
-  //let ppos  = pposx + ", " + pposy + ", " + pposz;
   player.SendChatMessage("Position: " + player.position.x);
   player.position = postotp;
   player.SendChatMessage("Position: " + player.position.x);
@@ -138,7 +145,6 @@ commands.set("checknear", (player, args) => {
 
 commands.set("register", (player, args) => {
   let password = args.join(" ");
-  //gm.utility.broadcastMessage("((BROADCAST)) " + player.name + ": " + args.join(" "));
 
   if(pLogged[player.name]) {
     return player.SendChatMessage("You was already registered");
@@ -148,7 +154,7 @@ commands.set("register", (player, args) => {
   
   connection.connect();
 
-  connection.query("SELECT name FROM users WHERE name = '" + player.name + "'", function(err, results) {
+  connection.query("SELECT name FROM users WHERE name = " + connection.escape(player.name), function(err, results) {
     
     let numRows = results.length;
 
@@ -157,26 +163,26 @@ commands.set("register", (player, args) => {
       return player.SendChatMessage("You was already registered sign in with: /login [Password]");
     }
   });
-
-  //let confirreg; // Variable que se asigna al jugador para que confirme la pwd
   
   if(ConfirmReg[player.name]) 
   {
     if(ConfirmPwd[player.name] == password) 
     {
       let salt = gm.config.mysql.salt;
-      password = connection.escape(password) + salt;
-      let pwdhash = gm.md5(password); //cryptomd5.createHash('md5').update(password).digest('hex');
+      password = password + salt;
+      let pwdhash = connection.escape(gm.md5(password));
+      console.log(pwdhash);
+      let playername = connection.escape(player.name);
       console.log("Hash created: " + pwdhash);
-      let SQLQuery = "INSERT INTO users (name, password) VALUES ('" + player.name+ "','" + pwdhash + "');";
+      let SQLQuery = "INSERT INTO users (name, password) VALUES (" + playername + "," + pwdhash + ");";
       connection.query(SQLQuery, function(err) {
         
         if(!err) {
             console.log("user "+ player.name + " registered sucesfull \n\n");
             player.SendChatMessage("You was been registered sucesfull");
-            connection.query("SELECT id FROM users WHERE name = '" + player.name + "'", function(err2, results)
+            connection.query("SELECT id FROM users WHERE name = " + playername, function(err2, results)
               {
-                //pId[player.name]      = results[0].id;
+
                 PlayerInfo[player.name].id = results[0].id;
                 /*PlayerInfo[player.name] = {
                   id: results[0].id,
@@ -229,30 +235,26 @@ commands.set("login", (player, args) => {
 
     let connection = gm.utility.dbConnect();
     connection.connect();
-    password = connection.escape(password) + gm.config.mysql.salt;
-    let pwdhash = gm.md5(password);
-    let SQLQuery = "SELECT * FROM users WHERE name = '" + player.name + "' AND password = '" + pwdhash + "'";
+    password = password + gm.config.mysql.salt;
+    let pwdhash = connection.escape(gm.md5(password));
+    let playername = connection.escape(player.name);
+    console.log(playername);
+    let SQLQuery = "SELECT * FROM users WHERE name = " + playername + " AND password = " + pwdhash;
     console.log(SQLQuery);
 
     connection.query(SQLQuery, function(err, results) {
       let num_rows = results.length;
 
       if(num_rows >= 1) {
-        //let someValue = rows[0];//rows[0].data.toString();
         
         if(results[0].banned) {
           player.Kick("You was banned from the server");
         }
 
-        /*pId[player.name]      = results[0].id;
-        PlayerInfo[player.name].adminlvl   = results[0].adminlvl;
-        pFaction[player.name] = results[0].faction;*/
-
         gm.events.onPlayerLogin(player, results[0]);
 
-        console.log(results[0]);
-        //pLogged[player.name] = true;
-        return true; // player.SendChatMessage("ID: " + pId[player.name] + "\nAdminLvl: " + PlayerInfo[player.name].adminlvl);
+        player.SendChatMessage("Loggin sucesfully");
+
       } else {
         player.SendChatMessage("Incorrect password, please try again.")
       }
@@ -266,13 +268,11 @@ commands.set("login", (player, args) => {
 
 commands.set("hash", (player, args) => {
   let text = args.join(" ");
-  let hashtext = gm.md5(text); //gm.crypto.createHash('md5').update(text).digest('hex');
+  let hashtext = gm.md5(text);
   player.SendChatMessage(hashtext);
 });
 
 commands.set("stats", (player) => {
-  //return player.SendChatMessage("ID: " + PlayerInfo[player.name].id + "\nAdminLevel: " + PlayerInfo[player.name].adminlvl);
-  //return player.SendChatMessage(PlayerInfo[player.name]);
 
   let stringJSON = JSON.stringify(PlayerInfo[player.name]);
 
@@ -306,7 +306,7 @@ commands.set("kick", (player, args) => {
 
   let reason = args[1];
   gm.utility.broadcastMessage("[ADMIN] " + targets[0].name + " was kicked from the server by " + player.name + " reason: " + reason);
-  targets[0].Kick("[ADMIN] You was kicked from the Server by " + player.name + " reason: " + reason);
+  targets[0].Kick("[ADMIN] " + targets[0].name + "kicked by " + player.name + " reason: " + reason);
 
 });
 
@@ -382,7 +382,7 @@ commands.set("promoteadmin", (player, args) => {
 
   PlayerInfo[targets[0].name].adminlvl = adminlvl;
 
-  if(!gm.events.onPlayerUpdate(player)) {
+  if(gm.events.onPlayerUpdate(targets[0])) {
     player.SendChatMessage("[ADMIN] You promoted " + targets[0].name + " to admin level: " + adminlvl);
     targets[0].SendChatMessage("[ADMIN] You was promoted to admin level " + adminlvl + " by " + player.name);
   } else {
@@ -426,9 +426,9 @@ commands.set("promotefaction", (player, args) => {
   }
 
 
-  PlayerInfo[player.name].faction = factionid;
+  PlayerInfo[targets[0].name].faction = factionid;
 
-  if(!gm.events.onPlayerUpdate(player)) {
+  if(gm.events.onPlayerUpdate(targets[0])) {
     player.SendChatMessage("[ADMIN] You promoted " + targets[0].name + " to faction id: " + factionid);
     targets[0].SendChatMessage("[ADMIN] You was promoted to faction: " + FactionName[factionid] + " by " + player.name);
   } else {
@@ -444,6 +444,12 @@ commands.set("f", (player,args) => {
   } else {
     return player.SendChatMessage("You don't have a faction");
   }
+});
+
+commands.set("a", (player,args) => {
+  let message = "(( [ADMIN] " + player.name + ": " + args.join(" ") + " ))";
+
+  gm.utility.adminMessage(message, new RGB(255,158,61));
 });
 
 commands.set("update", (player) => {
@@ -524,17 +530,156 @@ commands.set("giveLicense", (player, args) => {
 
   PlayerInfo[targets[0].name].licenses[giveLicens] = true;
 
-  if(!gm.events.onPlayerUpdate(player)) {
-    player.SendChatMessage("[ADMIN] You given " + giveLicens + " to : " + targets[0].name);
-    targets[0].SendChatMessage("[ADMIN] You recieved license: " + giveLicens + " by " + player.name);
-  } else {
-    player.SendChatMessage("[ERROR] An error ocurred when trying to upload player info of " + targets[0].name);
+  gm.events.onPlayerUpdate(targets[0]);
+
+  player.SendChatMessage("[ADMIN] You given " + giveLicens + " to : " + targets[0].name);
+  return targets[0].SendChatMessage("[ADMIN] You recieved license: " + giveLicens + " by " + player.name);
+
+
+
+});
+
+commands.set("removeLicense", (player, args) => {
+  
+  if(PlayerInfo[player.name].adminlvl < 3) {
+    return player.SendChatMessage("You don't have access to this command");
   }
 
-  //player.SendChatMessage("Command executed sucesfully");
+  let giveLicens = args[1];
+
+  let valLicenses = [];
+  let nameLicenses = "";
+
+  valLicenses = Object.keys(PlayerInfo[player.name].licenses);
+
+  for(let i in valLicenses) {
+    nameLicenses += valLicenses[i] + ", ";
+  }
 
 
+  if(giveLicens == null || giveLicens == "" || !gm.utility.isInArray(giveLicens, valLicenses)) {
+    player.SendChatMessage("Parameters: " + args[0] + " " + args[1]);
+    return player.SendChatMessage("/giveLicense [ID or name] [license: (" + nameLicenses + ")]");
+  }
 
+  let targets = gm.utility.getPlayer(args[0], true);
+
+  if (targets.length === 0) {
+    return player.SendChatMessage("Unknown Target.", red);
+  }
+  else if (targets.length > 1) {
+    let msg = "found multiple targets: ";
+    for (let p of targets) {
+      msg += p.name + ", ";
+    }
+    msg = msg.slice(0, msg.length - 2);
+    return player.SendChatMessage(msg, red);
+  }
+
+  if(!pLogged[targets[0].name]) {
+    return player.SendChatMessage("This user was not logged in");
+  }
+
+  // ---
+
+  PlayerInfo[targets[0].name].licenses[giveLicens] = false;
+  gm.events.onPlayerUpdate(targets[0]);
+
+  player.SendChatMessage("[ADMIN] You remove " + giveLicens + " to : " + targets[0].name);
+  return targets[0].SendChatMessage("[ADMIN] Your license: " + giveLicens + " was removed by " + player.name);
+
+});
+
+/*commands.set("try", (player, args) => {
+
+});
+
+commands.set("me", (player, args) => {
+
+});
+
+commands.set("report", (player, args) => {
+
+});
+
+commands.set("w", (player, args) => {
+
+});*/
+
+commands.set("call", (player, args) => {
+  
+  if(PlayerInfo[player.name].phone == 0) {
+    return player.SendChatMessage("You don't have a phone!");
+  }
+
+  if(pInCall[player.name]) {
+
+    if(pInCallNumber[player.name] != 911) 
+    {
+        for(let called of g_players) 
+        {
+          if(pInCall[called.name] == true && pInCallNumber[called.name] == PlayerInfo[player.name].phone)
+          {
+            pInCall[called.name] = false;
+            pInCallNumber[called.name] = 0;
+            called.SendChatMessage("The call has been hung");
+            break;
+          }
+        }
+    }
+    pInCall[player.name] = false;
+    pInCallNumber[player.name] = 0;
+    return player.SendChatMessage("The call has been hung");
+  }
+
+
+  let number = parseInt(args.join(" "));
+
+  if(isNaN(number) || number == 0) {
+    return player.SendChatMessage("This number is not valid");
+  }
+
+  if(number == 911) {
+
+    player.SendChatMessage("Hi, this is the police department of Los Santos");
+    player.SendChatMessage("How may I help you?");
+    pInCall[player.name] = true;
+    pInCallNumber[player.name] = 911;
+
+  } else {
+
+    // Check if is a valid telephone number and if the player with that number is connected (for)
+
+    if(gm.utility.CallNumber(player, number)) {
+      pInCall[player.name] = true;
+      pInCallNumber[player.name] = number;
+
+    } else {
+      player.SendChatMessage("The phone you called doesn't exist or is turned off.");
+    }
+
+  }
+
+  if(pInCall[player.name]) {
+    return player.SendChatMessage("When you want to hang out write again /call");
+  }
+
+});
+
+
+commands.set("hangon", (player) => {
+  
+  for(let caller of g_players) 
+  {
+    if(pInCall[caller.name] == true && pInCallNumber[caller.name] == PlayerInfo[player.name].phone) 
+    {
+      pInCall[player.name] = true;
+      pInCallNumber[player.name] = PlayerInfo[caller.name].phone;
+      caller.SendChatMessage("the call has been answered");
+      player.SendChatMessage("You hang on the call");
+      break;
+    }
+  }
 });
 
 commands.set("jsontest", (player) => {
@@ -543,12 +688,17 @@ commands.set("jsontest", (player) => {
 
 
   console.log(jsonString);
-  //console.log(PlayerInfo[player.name].adminlvl);
-  //infoLicenses[player.name].car = false;
 
 });
 
 commands.set("disconnect", (player) => {
   player.Kick("Normal quit");
+});
+
+commands.set("givePhone", (player) => {
+  let phonenumber = gm.utility.generatePhoneNumber();
+  //let phonenumber = 999999999;
+  PlayerInfo[player.name].phone = phonenumber;
+  player.SendChatMessage(PlayerInfo[player.name].phone.toString());
 });
 

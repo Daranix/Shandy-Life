@@ -1,9 +1,20 @@
-/**
- * @overview GTA:Multiplayer Godfivther - Roleplay: Events
- * @author "Daranix" & Jan "Waffle" C.
- * @copyright (c) GTA:Multiplayer [gta-mp.net]
- * @license https://master.gta-mp.net/LICENSE
- */
+/*
+
+/*
+ 
+  _|_|_|  _|                                  _|                _|        _|      _|_|            
+_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|    
+  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|  
+      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|        
+_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|  
+                                                        _|                                        
+                                                    _|_| 
+ *****************************************************************
+ * @overview GTA:Multiplayer Godfivther - Roleplay: Events       *
+ * @author "Daranix" & Jan "Waffle" C.                           *
+ *****************************************************************
+*/
+
 "use strict";
 
 /**
@@ -70,6 +81,17 @@ Events.onChatMessage = (player, message) => {
   }*/
     //return `${player.name}: ${message}`;
     let fmsg = player.name + ': ' + message;
+
+    if(pInCall[player.name]) {
+      if(pInCallNumber[player.name] == 911) {
+        let callMessage = "(CALL) " + message;  
+        gm.utility.factionMessage(1, callMessage, new RGB(0,0,255));
+      } else {
+        fmsg = "(Phone) " + player.name + ": " + message;
+        gm.utility.phoneTalkTo(player, fmsg, new RGB(255,255,0));
+      }
+    }
+
     gm.utility.proximityMessage(100.0, player, fmsg, new RGB(255,255,255))
     return true;  
 };
@@ -120,6 +142,7 @@ Events.onPlayerCreated = player => {
     adminlvl: 0,
     faction: 0,
     factionrank: 0,
+    phone: 0,
     licenses: {
       car: false,
       boat: false,
@@ -177,7 +200,6 @@ Events.onPlayerCreated = player => {
           Registered[player.name] = false;
         }
     });
-    //player.SendChatMessage("Admin lvl status = " + pAdmin[player.name])
     connection.end();
     console.log("Players connected: " + g_players.length);
   // --
@@ -247,17 +269,17 @@ Events.onPlayerUpdate = (player, info) => {
   " adminlvl=" + PlayerInfo[player.name].adminlvl +
   " ,faction=" + PlayerInfo[player.name].faction +
   " ,licenses='" + jsonString + "'" +
+  " ,phone=" + PlayerInfo[player.name].phone +
   " WHERE id = " + PlayerInfo[player.name].id;
 
   connection.query(SQLQuery, function(err) {
     if(err) {
-      console.log("An error ocurred trying to upload the info of " + player.name);
-      console.log("QUERY: " + SQLQuery);
-      console.log("[ERROR]: " + err)
-      return true;
+      gm.utility.print("An error ocurred trying to upload the info of " + player.name);
+      gm.utility.print("QUERY: " + SQLQuery);
+      gm.utility.print("[ERROR]: " + err);
+      player.SendChatMessage(gm.utility.timestamp() + " An error ocurred trying to upload your player info, please contact and administrator");
     } else {
       if(showInfo) { console.log("player data of " + player.name + " has been updated"); }
-      return false;
     }
   });
 
@@ -285,13 +307,9 @@ Events.updateAllPlayers = () => {
 
 Events.onPlayerLogin = (player, dbData) => {
 
-  /*let tempLicences = JSON.parse(dbData.licenses)
+  console.log("dbData \n" + dbData);
 
-  console.log("License car status: " + tempLicences.car);*/
-  console.log("dbData:");
-  console.log(dbData);
-  console.log("ID: " + dbData.id);
-  console.log("LICENSES: " + dbData.licenses);
+  gm.utility.print("Player " + player.name + "logged in");
 
   let parsedLicenses = JSON.parse(dbData.licenses);
 
@@ -300,6 +318,7 @@ Events.onPlayerLogin = (player, dbData) => {
     adminlvl: dbData.adminlvl,
     faction: dbData.faction,
     factionrank: dbData.factionrank,
+    phone: dbData.phone,
     licenses: parsedLicenses /*{
       car: false,
       boat: false,

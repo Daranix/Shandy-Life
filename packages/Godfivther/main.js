@@ -1,14 +1,22 @@
-/**
- * @overview GTA:Multiplayer Godfivther - Roleplay Mode
- * @author "Daranix" & Jan "Waffle" C.
- * @copyright (c) GTA:Multiplayer [gta-mp.net]
- * @license https://master.gta-mp.net/LICENSE
+/*
+ 
+  _|_|_|  _|                                  _|                _|        _|      _|_|            
+_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|    
+  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|  
+      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|        
+_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|  
+                                                        _|                                        
+                                                    _|_| 
+ *****************************************************************
+ * @overview GTA:Multiplayer Godfivther - Roleplay: Main File    *
+ * @author "Daranix" & Jan "Waffle" C.                           *
+ *****************************************************************
  */
 
 "use strict";
 
 /*
-    A few notes from Jan:
+    A few notes from Jan (Waffle):
     The default package is using the strict mode. If you need more information about the strict mode, read this:
         https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
     We are also using ES6 features:
@@ -36,20 +44,22 @@ global.PlayerInfo = [];
 
 //Other player variables
 global.pLogged    = [];
+global.pInCall    = [];
+global.pInCallNumber  = [];
 global.ConfirmReg = [];
 global.ConfirmPwd = [];
 global.Registered = [];
 
 
 //Assoc faction ID to name
-global.FactionName = ["none",
-                      "Police"];
+global.FactionName = ["none", // 0
+                      "Police"]; // 1
 //Assoc license to a good name
-global.LicenseName = ["Drive license", 
-                      "Boat license", 
-                      "Truck license", 
-                      "Helicopter pilot license", 
-                      "Plane pilot license"];
+global.LicenseName = ["Drive license", // car
+                      "Boat license",  // boat
+                      "Truck license",  // truck
+                      "Helicopter pilot license", // pilot_helicopter 
+                      "Plane pilot license"]; // pilot_plane
 
 global.gm = {
   config:   require('./config.js'),
@@ -78,10 +88,22 @@ function main () {
 
   gm.events.register();
 
-  printf("Server started!");
+  gm.utility.print("Server started!");
   let updateInterval = gm.utility.minutes(1);
-  printf("Player update interval: " + updateInterval + " miliseconds");
-  //setInterval(function() { gm.events.updateAllPlayers(); }, updateInterval);
+  gm.utility.print("Player update interval: " + updateInterval + " miliseconds");
+
+  setInterval(function() { gm.events.updateAllPlayers(); }, updateInterval);
+  //setInterval(gm.events.updateAllPlayers(), updateInterval)
+  console.log("+==============================================================+");
+  console.log("  _______ __                   __        ___    __  ___");       
+  console.log(" |   _   |  |--.---.-.-----.--|  .--.--.|   |  |__.'  _.-----.");
+  console.log(" |   1___|     |  _  |     |  _  |  |  ||.  |  |  |   _|  -__|");
+  console.log(" |____   |__|__|___._|__|__|_____|___  ||.  |__|__|__| |_____|");
+  console.log(" |:  1   |                       |_____||:  1   | ");            
+  console.log(" |::.. . |                              |::.. . | ");            
+  console.log(" `-------'                              `-------' ");   
+  console.log("+=============================================================+");
+  
 }
 
 main();
