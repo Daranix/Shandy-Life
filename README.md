@@ -2,6 +2,8 @@
 
 Shandy Life is a early release of a gamemode roleplay for GTA:MP
 
+If you have any questions try looking the [wiki](https://github.com/Daranix/Shandy-Life/wiki)
+
 # Changelog
 
 # 0.3
