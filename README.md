@@ -6,7 +6,13 @@ If you have any questions try looking the [wiki](https://github.com/Daranix/Shan
 
 # Changelog
 
-# 0.3
+### 0.4
+
+- Added vehicle spawn from database (basic)
+- Some code improvements
+- I added a concept of what could be the player menu
+
+### 0.3
 
 - Added phone system
 - Some bug fixes
