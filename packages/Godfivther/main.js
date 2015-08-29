@@ -8,8 +8,8 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
                                                         _|                                        
                                                     _|_| 
  *****************************************************************
- * @overview GTA:Multiplayer Godfivther - Roleplay: Main File    *
- * @author "Daranix" & Jan "Waffle" C.                           *
+ * @overview GTA:Multiplayer Shandy Life - Roleplay: Main File   *
+ * @authors "Daranix" & Jan "Waffle" C.                          *
  *****************************************************************
  */
 
@@ -40,7 +40,10 @@ global.pMoney     = [];
 global.pFaction   = [];
 global.pId        = [];*/
 //global.pLicenses  = [[],[]];
+
+// PlayerInfo definition
 global.PlayerInfo = [];
+global.PlayerInventory = [];
 
 //Other player variables
 global.pLogged    = [];
@@ -49,7 +52,7 @@ global.pInCallNumber  = [];
 global.ConfirmReg = [];
 global.ConfirmPwd = [];
 global.Registered = [];
-
+// ----
 
 //Assoc faction ID to name
 global.FactionName = ["none", // 0
@@ -66,34 +69,43 @@ global.gm = {
   events:   require('./events.js'),
   utility:  require('./utility.js'),
   mysql:    require('./node_modules/mysql'),
-  md5:      require('./node_modules/md5'),
+  md5:      require('./node_modules/md5')
   //fs:       require('./node_modules/writable-file-stream') // ONLY WRITE
 };
-
-function printf(msg) {
-  let fmsg = gm.utility.timestamp() + " " + msg;
-  console.log(fmsg);
-  /*let f = gm.fs("./logs/general.txt");
-  f.write(fmsg+ "\n");
-  f.end();*/
-}
 
 /**
  * The main function of this package.
  */
-function main () {
-  //console.log("Registering Events...");
-  
-  printf("Registering Events...")
 
+function main () {
+  
+  gm.utility.print("Registering Events...");
   gm.events.register();
 
-  gm.utility.print("Server started!");
+  // ---- This is for check database connection and spawn vehicles ----- //
+
+  let testdb = gm.utility.dbConnect(); 
+
+  testdb.connect(function(err) {
+    if(err) {
+      console.log("Error connecting to the database ... ")
+      throw err;
+    } else {
+      console.log('Database connected!')
+    }
+  });
+
+  gm.utility.LoadVehicles(testdb); // Spawn the vehicles
+
+  testdb.end();
+
+  // ---------------------------------------------- //
+
   let updateInterval = gm.utility.minutes(1);
   gm.utility.print("Player update interval: " + updateInterval + " miliseconds");
 
   setInterval(function() { gm.events.updateAllPlayers(); }, updateInterval);
-  //setInterval(gm.events.updateAllPlayers(), updateInterval)
+
   console.log("+==============================================================+");
   console.log("  _______ __                   __        ___    __  ___");       
   console.log(" |   _   |  |--.---.-.-----.--|  .--.--.|   |  |__.'  _.-----.");
@@ -103,6 +115,7 @@ function main () {
   console.log(" |::.. . |                              |::.. . | ");            
   console.log(" `-------'                              `-------' ");   
   console.log("+=============================================================+");
+  gm.utility.print("Server started!");
   
 }
 

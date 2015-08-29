@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Player Menu</title>
+	<link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="./css/style.css">
+	<link rel="stylesheet" href="./iconmoon/style.css">
+	<link rel="stylesheet" href="./flaticon/flaticon.css"
+</head>
+<body>
+<div class="someOpacity">
+	<div class="container white-hidden" >
+	    <div class="row">
+	        <div class="center-block">row center-block</div>
+	    </div>
+	    <div class="row">
+	        <div class="col-md-2 brd">
+	            <div class="center-block">1 center-block</div>
+	        </div>
+	        <div class="col-md-2 brd">
+	            <div class="center-block">2 center-block</div>
+	        </div>
+	    </div>
+	</div>
+	<div class="row">
+	    <div class="col-xs-6 col-center-block playermenu">
+	    	<table>
+	    		<tr class="table-title">
+	    			<td colspan="3">
+	    				<span class="glyphicon glyphicon-user" aria-hidden="true"></span> Player Menu
+	    			</td>
+	    		</tr>
+
+				<tr class="table-sub-titles"> <!-- Div titles -->
+				   	<td><span class="glyphicon icon-coin-dollar" aria-hidden="true"></span> MONEY</td>
+					<td><span class="glyphicon glyphicon-credit-card" aria-hidden="true"></span> LICENSES</td>
+					<td><span class="glyphicon glyphicon-briefcase" aria-hidden="true"></span> INVENTORY</td>
+				<tr class="table-content"> <!--Content -->
+					<td class="table-padding table-player-money"> <!-- Money -->
+					<div class="table-player-money-fix">
+						<br>
+						<span class="glyphicon flaticon-wallet33" aria-hidden="true"></span> Hand: 1000000000$<br>
+						<span class="glyphicon flaticon-tool9" aria-hidden="true"></span> Bank: 100$<br>
+						<hr>
+						Give money:
+						<div class="input-group input-group-sm">
+					      <input type="text" class="form-control" placeholder="Amount" aria-describedby="sizing-addon3">
+					      <span class="input-group-addon" id="sizing-addon3">$</span>
+					    </div>
+						<br>
+						Select player to give money:<br>
+						<select>
+							<option value="player1">Player 1</option>
+							<option value="player2">Player 2</option>
+							<option value="player3">Player 3</option>
+						</select>
+
+						<br>
+						<br>
+						<button type="button" class="btn btn-default btn-sm">
+							  <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> Give money
+						</button>
+						<br>
+						<br>
+					</div>
+					</td>
+					<td class="table-licenses-container table-separator table-padding"> <!-- Licenses -->
+						<div class="scroll-div">
+							Car license<br>
+							Boat license<br>
+							Truck license<br>
+							Helicopter pilot license <br>
+							Plane pilot license<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+							test<br>
+						</div>
+					</td>
+
+					<td class="table-separator table-padding table-inventory"> <!-- Inventory -->
+						<br>
+						<select class="inventory" size="10">
+						  <option value="Lockpick">Lockpick (1)</option>
+						  <option value="carkey-321">Carkey (Zentorno)</option>
+						  <option value="redbull">Redbull (1)</option>
+						  <option value="apple">Apple (3)</option>
+						</select>
+						
+						<hr>
+						Select a player to give item:
+						<select class="inventory">
+							<option value="player1">Player 1</option>
+							<option value="player2">Player 2</option>
+							<option value="player3">Player 3</option>
+						</select>
+
+						<br>
+
+						<div style="margin-bottom: 10px; margin-top: 5px; width: 90%;">
+					      <input type="text" value="1" class="form-control" placeholder="Amount" aria-describedby="sizing-addon3">
+					      
+					    </div>
+
+						<div>
+							<button type="button" class="btn btn-default btn-sm" id="give">
+								  <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span> GIVE
+							</button>
+
+							<button type="button" class="btn btn-default btn-sm">
+								  <span class="glyphicon glyphicon-hand-right" aria-hidden="true"></span> USE
+							</button>
+
+							<button type="button" class="btn btn-default btn-sm">
+								  <span class="glyphicon icon-bin" aria-hidden="true"></span> DROP
+							</button>
+						</div>
+						<br>
+					
+					</td>
+	    	</table>
+	    </div>
+	</div>
+	</div>
+
+	<div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="Small modal" id="infomodal">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content" id="modalcontent">
+	      Hi
+	    </div>
+	  </div>
+	</div>
+	<!--
+    <footer>
+      <div class="container">
+      	<p><h3>Press [ESC] to exit</h3></p>
+      </div>
+    </footer>
+	-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="./bootstrap/js/bootstrap.min.js"></script>
+	<script>
+		$('#give').on('click', function() {
+			var selectedPlayer = $('itemSelect').value;
+
+			document.getElementById('modalcontent').innerHTML = "This is a test";
+
+			$("#infomodal").modal('show');
+
+
+		});
+	</script>
+
+
+</body>
+</html>

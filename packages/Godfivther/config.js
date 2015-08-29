@@ -7,10 +7,10 @@ _|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              
 _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|  
                                                         _|                                        
                                                     _|_| 
- *****************************************************************
- * @overview GTA:Multiplayer Godfivther - Roleplay: config  file *
- * @author "Daranix" & Jan "Waffle" C.                           *
- *****************************************************************
+ ********************************************************************
+ * @overview GTA:Multiplayer | Shandy Life - Roleplay: config  file *
+ * @author "Daranix" & Jan "Waffle" C.                              *
+ ********************************************************************
 */
 
 "use strict";
@@ -35,7 +35,7 @@ module.exports = {
   },
   
   mysql: {
-    host     : 'localhost',
+    host     : '127.0.0.1',
     user     : 'root',
     password : 'root',
     database : 'roleplay',

@@ -1,0 +1,114 @@
+.col-center-block {
+    float: none;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.white-hidden {
+	opacity: 0.0;
+}
+
+html, body {
+	height: 100%;
+}
+
+body {
+	/*background-color: rgba(0,0,0,1);*/
+	background-image: url("../background.jpg");
+	background-size: cover;
+
+}
+
+.someOpacity {
+
+	background-color: rgba(0,0,0,0.3);
+	height: 100%;
+}
+
+.playermenu {
+	background-color: white;
+	border-radius: 10px 10px 10px 10px;
+	border: 2px solid #51855c;
+	padding: 0;
+}
+
+.playermenu>table {
+	width: 100%;
+}
+
+.table-title {
+	color: white;
+	background-color: #51855c;
+	font-size: 16px;
+	text-align: center;	
+}
+
+.table-sub-titles {
+	color: white;
+	background-color: #51855c;
+	font-size: 11px;
+	text-align: center;	
+}
+
+.table-separator {
+	border-left: 2px solid #51855c;
+}
+
+.table-padding {
+	padding-left: 10px;
+}
+
+.table-content {
+	height: 300px;
+}
+
+.table-content>td {
+	height: 100%;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.table-player-money {
+	width: 30%;
+	padding-right: 10px;
+}
+
+.table-player-money-fix {
+	height: 100%;
+}
+
+.table-player-licenses {
+	width: 30%;
+	margin-left: 10px;
+}
+
+.table-player-inventory {
+	width: 40%;
+
+}
+
+.scroll-div {
+    overflow: scroll;
+    height: 100%;
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 5px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 1px;
+    background-color: rgba(0,0,0,0.3);
+    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+}
+
+footer {
+	margin-top: calc(100% - 85%) ;
+	text-align: right;
+	color: white;
+}
+
+.inventory {
+	width: 95%;
+}

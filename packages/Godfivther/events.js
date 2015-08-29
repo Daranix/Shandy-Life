@@ -10,7 +10,7 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
                                                         _|                                        
                                                     _|_| 
  *****************************************************************
- * @overview GTA:Multiplayer Godfivther - Roleplay: Events       *
+ * @overview GTA:Multiplayer Shandy Life - Roleplay: Events      *
  * @author "Daranix" & Jan "Waffle" C.                           *
  *****************************************************************
 */
@@ -152,6 +152,14 @@ Events.onPlayerCreated = player => {
     },
   };
 
+  /*PlayerInventory[player.name] = {
+    objects: {},
+    objectsQuantity: {},
+    weight: 0,
+    maxWeight: 64
+
+  };*/
+
   console.log("Player " + player.name + " has successfully joined the server.");
 
   // Set world for the player
@@ -173,11 +181,11 @@ Events.onPlayerCreated = player => {
   player.SendChatMessage("Welcome to my Server!", new RGB(0, 255, 0));
   player.SendChatMessage("<em>Type /help to see a list of all commands</em>");
 
-  // REG SYSTEM
+  // REG SYSTEM - Check if player is registered.
 
     let connection = gm.utility.dbConnect();
 
-    connection.connect(function(err){
+    /*connection.connect(function(err){
       
       if(!err) {
           console.log("Database is connected ... \n\n");  
@@ -185,9 +193,12 @@ Events.onPlayerCreated = player => {
           console.log("Error connecting database ... \n\n");  
       }
 
-    });
+    });*/
 
-    connection.query("SELECT name FROM users WHERE name = '" + player.name + "'", function(err, results) {
+    connection.connect();
+
+    let playername = connection.escape(player.name);
+    connection.query("SELECT name FROM users WHERE name = " + playername, function(err, results) {
         
         let numRows = results.length;
 
@@ -257,8 +268,9 @@ Events.onPlayerDestroyed = player => {
  * This event wasn't a GTA:MP native event
 */
 
-Events.onPlayerUpdate = (player, info) => {
-  let showInfo = info || true;
+Events.onPlayerUpdate = (player, callback, info) => {
+  //let showInfo = info || true;
+  info = typeof info !== 'undefined' ? info : true;
   let connection = gm.utility.dbConnect();
   
   let jsonString = JSON.stringify(PlayerInfo[player.name].licenses);
@@ -277,9 +289,11 @@ Events.onPlayerUpdate = (player, info) => {
       gm.utility.print("An error ocurred trying to upload the info of " + player.name);
       gm.utility.print("QUERY: " + SQLQuery);
       gm.utility.print("[ERROR]: " + err);
-      player.SendChatMessage(gm.utility.timestamp() + " An error ocurred trying to upload your player info, please contact and administrator");
+      callback(false);
+      //player.SendChatMessage(gm.utility.timestamp() + " An error ocurred trying to upload your player info, please contact and administrator");
     } else {
-      if(showInfo) { console.log("player data of " + player.name + " has been updated"); }
+      if(info) { gm.utility.print("player data of " + player.name + " has been updated " + info); }
+      callback(true);
     }
   });
 
@@ -288,30 +302,67 @@ Events.onPlayerUpdate = (player, info) => {
 };
 
 Events.updateAllPlayers = () => {
-
-    if(g_players.length >= 1) 
-    {
+  let loggedPlayers = 0;
+  if(g_players.length >= 1) 
+  {
      console.log("Uploading all players info...");
-     for (let player of g_players) 
-     {
+    for (let player of g_players) 
+    {
       if(pLogged[player.name]) 
       {
-        Events.onPlayerUpdate(player, false);
+        Events.onPlayerUpdate(player,function(){},false);
+        loggedPlayers++;
       }
     }
 
-    console.log("info of all players has been uploaded");
+    console.log("info of all players (" + loggedPlayers + ") has been uploaded");
 
   }
 };
 
 Events.onPlayerLogin = (player, dbData) => {
 
-  console.log("dbData \n" + dbData);
+  //console.log("dbData: \n" + JSON.stringify(dbData));
 
-  gm.utility.print("Player " + player.name + "logged in");
+  gm.utility.print("Player " + player.name + " logged in");
 
-  let parsedLicenses = JSON.parse(dbData.licenses);
+  /*
+    ----- Check if licenses are ok -----
+  */
+
+
+  let parsedLicenses;
+
+  if(dbData.licenses.length == 0) {
+    parsedLicenses = PlayerInfo[player.name].licenses
+  } else {
+    parsedLicenses = JSON.parse(dbData.licenses);
+  }
+
+  let parsedLength = Object.keys(parsedLicenses).length;
+  let licensesLength = Object.keys(PlayerInfo[player.name].licenses).length;
+
+  if(parsedLength < licensesLength) {
+    
+    let howMuch = licensesLength - parsedLength;
+    let keys = Object.keys(PlayerInfo[player.name].licenses);
+
+    for(let i = howMuch; i <  licensesLength; i++) {
+      parsedLicenses[keys[i]] = false;
+    }
+  }
+
+  // ---- 
+
+  /*if(dbLicenseslength == lengthLicenses) {
+    parsedLicenses = JSON.parse(dbData.licenses);
+  } else {
+    parsedLicenses = PlayerInfo[player.name].licenses;
+  }*/
+
+  //let parsedLicenses = JSON.parse(dbData.licenses);
+
+  // Put values to the player
 
   PlayerInfo[player.name] = {
     id: dbData.id,
@@ -330,3 +381,10 @@ Events.onPlayerLogin = (player, dbData) => {
 
   pLogged[player.name] = true;
 };
+
+Events.OnVehicleSpawn = (vehicle) => {
+
+  //console.log("car spawned");
+
+};
+

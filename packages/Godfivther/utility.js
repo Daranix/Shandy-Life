@@ -1,8 +1,16 @@
-/**
- * @overview GTA:Multiplayer Godfivther - Roleplay: Utility file
- * @author "Daranix" & Jan "Waffle" C.
- * @copyright (c) GTA:Multiplayer [gta-mp.net]
- * @license https://master.gta-mp.net/LICENSE
+/*
+ 
+  _|_|_|  _|                                  _|                _|        _|      _|_|            
+_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|    
+  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|  
+      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|        
+_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|  
+                                                        _|                                        
+                                                    _|_| 
+ ********************************************************************
+ * @overview GTA:Multiplayer | Shandy Life | Roleplay: Utility file *
+ * @author "Daranix" & Jan "Waffle" C.							    *
+ ********************************************************************
  */
 "use strict";
 
@@ -79,19 +87,11 @@ Utility.getPlayer = (idOrName, opt_allowDuplicates, opt_caseSensitive) => {
 
 //CUSTOM RP FUNCTIONS
 
-Utility.PlayerToPoint = (radi, player, x, y, z) => {
-	let oldposx = player.position.x;
-	let oldposy = player.position.y;
-	let oldposz = player.position.z;
-	//let tempposx, tempposy, tempposz;
-	let tempposx = (oldposx - x);
-	let tempposy = (oldposy - y);
-	let tempposz = (oldposz - z);
-	if (((tempposx < radi) && (tempposx > -radi)) && ((tempposy < radi) && (tempposy > -radi)) && ((tempposz < radi) && (tempposz > -radi)))
-   	{
-    	return 1;
-   	}
-	return 0;
+Utility.PlayerToPoint = (range, player, x, y, z) => {
+
+    let sphere = new Utility.sphere(x, y, z, range)
+
+    return sphere.inRangeOfPoint(player.position);
 };
 
 Utility.GetPlayerMoney = (player) => {
@@ -294,3 +294,72 @@ Utility.phoneTalkTo = (caller, message, opt_color) => {
 		}
 	}
 };
+
+Utility.sphere = class Sphere { // By Tirus
+
+    constructor(x, y, z, opt_radius) {
+	    this.x = x;
+	    this.y = y;
+	    this.z = z;
+	    this.radius = opt_radius || 1;
+    }
+
+};
+
+//var xsphere = Utility.sphere;
+
+Utility.sphere.prototype.inRangeOfPoint = function(position) { // By Tirus
+
+	return (Math.pow((position.x - this.x), 2) +
+            Math.pow((position.y - this.y), 2) +
+            Math.pow((position.z - this.z), 2) < Math.pow(this.radius, 2));
+}
+
+// Vehicle spawn
+
+Utility.VehicleSpawn = function(model, x, y, z, rotation) { // Unused param rotation
+	console.log(model);
+	let fmodel;
+	if(typeof model === "string") {
+		fmodel = Utility.hashes.findByName(gm.utility.hashes.vehicles, model);
+	} else {
+		fmodel = Utility.hashes.vehicles[model];
+	}
+
+	//console.log(fmodel)
+	const vehicle = new Vehicle(new Vector3f(x, y, z), fmodel.h);
+  	//vehicle.rotation.z = rotation;
+
+  	gm.events.OnVehicleSpawn(vehicle);
+  	return vehicle;
+}
+
+Utility.LoadVehicles = (dbconnection) => {
+
+  let connection = dbconnection;
+
+  let SQLQuery = "SELECT * FROM cars";
+
+  connection.query(SQLQuery, function(err, result) {
+  console.log("Loading vehicles...");
+    if(err) {
+      gm.utility.print("An error ocurred trying to load a vehicle");
+      gm.utility.print("QUERY: " + SQLQuery);
+      gm.utility.print("[ERROR]: " + err);
+    } else {
+    	let num_rows = result.length;
+    	let cr = 0;
+
+    	while(num_rows > cr) {
+    		Utility.VehicleSpawn(result[cr].modelid, result[cr].posx, result[cr].posy, result[cr].posz);
+    		cr++;
+    	}
+
+    	console.log("Spawned " + cr + " car(s)")
+
+    }
+
+  });
+
+
+}

@@ -1,0 +1,10 @@
+{
+  "unused": true,
+  "undef": true,
+  "node": true,
+  "esnext": true,
+  "curly": true,
+  "eqeqeq": true,
+  "freeze": true,
+  "predef": ["global", "g_server", "g_players", "g_utility", "events", "RGB", "Vector3f", "Vector3", "Package" ,"gm"]
+}

@@ -1,0 +1,34 @@
+@font-face {
+	font-family: 'icomoon';
+	src:url('fonts/icomoon.eot?-3jv65x');
+	src:url('fonts/icomoon.eot?#iefix-3jv65x') format('embedded-opentype'),
+		url('fonts/icomoon.ttf?-3jv65x') format('truetype'),
+		url('fonts/icomoon.woff?-3jv65x') format('woff'),
+		url('fonts/icomoon.svg?-3jv65x#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-coin-dollar:before {
+	content: "\e600";
+}
+.icon-credit-card:before {
+	content: "\e601";
+}
+.icon-banknote:before {
+	content: "\e602";
+}
