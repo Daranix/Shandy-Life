@@ -23,6 +23,7 @@ function interior() {
 
 module.exports = {
   badWords: ["fuck", "shit", "BitEmE"],
+  badNames: ["PLAYER_DELETED_HERE"],
   world: {
     weather: 1,
     windLevel: 0.0,

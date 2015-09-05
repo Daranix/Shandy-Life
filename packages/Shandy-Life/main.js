@@ -52,10 +52,23 @@ global.pInCallNumber  = [];
 global.ConfirmReg = [];
 global.ConfirmPwd = [];
 global.Registered = [];
+global.GroupInvite = [];
 // ----
 
+// Shopping system variables
+global.g_shops = 0;
+global.ShopInfo = [];
+// Group system variables
+global.g_groups = 0;
+global.GroupInfo = [];
+
+
+// Timers of call system
+global.TimerRing = [];
+global.gTimerRing = [];
+
 //Assoc faction ID to name
-global.FactionName = ["none", // 0
+global.FactionName = ["none",    // 0
                       "Police"]; // 1
 //Assoc license to a good name
 global.LicenseName = ["Drive license", // car
@@ -69,7 +82,8 @@ global.gm = {
   events:   require('./events.js'),
   utility:  require('./utility.js'),
   mysql:    require('./node_modules/mysql'),
-  md5:      require('./node_modules/md5')
+  md5:      require('./node_modules/md5'),
+  items:    require('./inventory.js')
   //fs:       require('./node_modules/writable-file-stream') // ONLY WRITE
 };
 
@@ -81,6 +95,9 @@ function main () {
   
   gm.utility.print("Registering Events...");
   gm.events.register();
+
+  // Load shop system
+  gm.utility.LoadShops();
 
   // ---- This is for check database connection and spawn vehicles ----- //
 
@@ -96,10 +113,10 @@ function main () {
   });
 
   gm.utility.LoadVehicles(testdb); // Spawn the vehicles
-
+  gm.utility.LoadGroups(testdb); // Spawn groups
   testdb.end();
 
-  // ---------------------------------------------- //
+  // ----------------------------------------------------------------- //
 
   let updateInterval = gm.utility.minutes(1);
   gm.utility.print("Player update interval: " + updateInterval + " miliseconds");

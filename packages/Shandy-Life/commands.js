@@ -700,18 +700,281 @@ commands.set("hangon", (player) => {
       pInCallNumber[player.name] = PlayerInfo[caller.name].phone;
       caller.SendChatMessage("the call has been answered");
       player.SendChatMessage("You hang on the call");
+      clearInterval(TimerRing[player.name]);
+      clearTimeout(gTimerRing[player.name]);
       break;
     }
   }
 });
 
 
+commands.set("group", (player, args) => {
+  
+  let option = args[0];
+
+  switch(option) {
+    case 'create': // Group creation
+    {
+      let gname = args[1];
+
+      if(typeof gname === 'undefined') {
+        return player.SendChatMessage("/group create [group name]");
+      }
+
+      if(PlayerInfo[player.name].groupid >= 1) return player.SendChatMessage("You was already in a group");
+
+      let group = new gm.utility.Group(gname);
+      group.create(player);
+      break;
+    }
+
+    case 'invite': { // Invite / invitations
+
+
+      if(typeof args[1] === 'undefined') return player.SendChatMessage("/group invite [player id or name] | accept/refuse");
+
+      // Accept
+
+      if(args[1] == 'accept') {
+
+        if(typeof GroupInvite[player.name] === 'undefined' || GroupInvite[player.name] == '') return player.SendChatMessage("You don't have a invitations to accept");
+
+        //let grid = GroupInvite[player.name];
+
+        gm.utility.Group.addmember(player, GroupInvite[player.name]);
+
+        GroupInvite[player.name] = '';
+        //player.SendChatMessage("New member to de group: " + player.name);
+        gm.utility.groupMessage(PlayerInfo[player.name].groupid, "New member to the group: " + player.name, new RGB(255,255,255));
+        return player.SendChatMessage("Welcome to the group: " + gm.utility.Group.findNameById(PlayerInfo[player.name].groupid));
+
+      }
+
+      // Refuse
+
+      if(args[1] == 'refuse') {
+
+         if(typeof GroupInvite[player.name] === 'undefined' || GroupInvite[player.name] == '') return player.SendChatMessage("You don't have a invitations to delince");
+
+        GroupInvite[player.name] = '';
+        return player.SendChatMessage("You delinced the invitation to the group: " + GroupInfo[GroupInvite[player.name]].name)
+      }
+
+      if(PlayerInfo[player.name].groupid == 0) {
+        return player.SendChatMessage("You dont have a group!");
+      }
+
+      // Invite player
+
+      let gid = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+
+      let index = GroupInfo[gid].members.indexOf(player.name); //GroupInfo[gid].membersrank.indexOf(GroupInfo[gid].members);
+      let memberrank = GroupInfo[gid].membersrank[index];
+
+      if(memberrank < 3) {
+        return player.SendChatMessage("You dont have permission to invite people to the group");
+      }
+
+      let targets = gm.utility.getPlayer(args[1], true);
+
+        if (targets.length === 0) {
+          return player.SendChatMessage("Unknown Target.", red);
+        }
+        else if (targets.length > 1) {
+          let msg = "found multiple targets: ";
+          for (let p of targets) {
+            msg += p.name + ", ";
+          }
+          msg = msg.slice(0, msg.length - 2);
+          return player.SendChatMessage(msg, red);
+        }
+
+      if(PlayerInfo[targets[0].name].groupid >= 1) return player.SendChatMessage("This player was already in a group");
+      //let group = new gm.utility.Group(GroupInfo[gid].name);
+      //let igid = PlayerInfo[player.name].groupid; //GroupInfo[PlayerInfo[player.name].groupid].id;
+
+      GroupInvite[targets[0].name] = gid;
+
+      targets[0].SendChatMessage("You recieved a invitation to the group " + GroupInfo[gid].name + " from " + player.name);
+      targets[0].SendChatMessage("You can accept/delince the invitation using: /group invite (accept/refuse)");
+      break;
+
+    }
+
+    case 'leave': {
+      
+      if(PlayerInfo[player.name].groupid == 0) return player.SendChatMessage("You dont have a group!");
+      
+      let groupName = gm.utility.Group.findNameById(PlayerInfo[player.name].groupid);
+
+      player.SendChatMessage("You leaved from the group: " + groupName);
+      // Send group message
+      let groupIndex = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+
+      gm.utility.Group.removemember(player);//, groupIndex);
+      break;
+
+    }
+    case 'kick': {
+      if(PlayerInfo[player.name].groupid == 0 ) return player.SendChatMessage("You don't have a group!");
+
+      let indexGroup = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+
+      let indexRank = GroupInfo[indexGroup].members.indexOf(player.name);
+
+      if(GroupInfo[indexGroup].membersrank[indexRank] < 4) return player.SendChatMessage("You don't have permission to do that!");
+
+      if(typeof args[1] === 'undefined') return player.SendChatMessage("/group kick [player id or name]");
+
+      let targets = gm.utility.getPlayer(args[1], true);
+
+        if (targets.length === 0) {
+          return player.SendChatMessage("Unknown Target.", red);
+        }
+        else if (targets.length > 1) {
+          let msg = "found multiple targets: ";
+          for (let p of targets) {
+            msg += p.name + ", ";
+          }
+          msg = msg.slice(0, msg.length - 2);
+          return player.SendChatMessage(msg, red);
+        }
+
+        if(PlayerInfo[player.name].groupid != PlayerInfo[targets[0].name].groupid) return player.SendChatMessage("This player wasn't in your group");
+
+        gm.utility.Group.removemember(targets[0]);
+
+        player.SendChatMessage("You kicked: " + targets[0].name + " from the group");
+        targets[0].SendChatMessage("You was kicked from the group " + GroupInfo[indexGroup].name + " by " + player.name);
+        break;
+    }
+
+    case 'promote': {
+      
+      if(PlayerInfo[player.name].groupid == 0) return player.SendChatMessage("You aren't in a group");
+
+      let indexGroup = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+
+      let indexRank = GroupInfo[indexGroup].members.indexOf(player.name);
+
+      if(GroupInfo[indexGroup].membersrank[indexRank] != 7) return player.SendChatMessage("You don't have permission to do that!");
+
+      if(typeof args[1] === 'undefined') return player.SendChatMessage("/group promote [player id or name] [rank]");
+
+      let targets = gm.utility.getPlayer(args[1], true);
+
+        if (targets.length === 0) {
+          return player.SendChatMessage("Unknown Target.", red);
+        }
+        else if (targets.length > 1) {
+          let msg = "found multiple targets: ";
+          for (let p of targets) {
+            msg += p.name + ", ";
+          }
+          msg = msg.slice(0, msg.length - 2);
+          return player.SendChatMessage(msg, red);
+        }
+
+        let rank = parseInt(args[2]);
+
+        if(rank < 1 || rank > 6) return player.SendChatMessage("Rank must be between 1 and 6")
+
+        let promoteIndex = GroupInfo[indexGroup].members.indexOf(targets[0].name);
+
+        GroupInfo[indexGroup].membersrank[promoteIndex] = rank;
+
+        player.SendChatMessage("You promoted " + targets[0].name + " to rank " + rank);
+        targets[0].SendChatMessage("You was promoted to rank " + rank + " by " + player.name);
+
+    }
+
+    case 'show': {
+      // Show info group (members & ranks)
+      if(PlayerInfo[player.name].groupid == 0) {
+        return player.SendChatMessage("You aren't in a group");
+      }
+
+      let gid = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+      if(!gid) { 
+        player.SendChatMessage("Groups: " + g_groups)
+        return player.SendChatMessage("Error when trying to get group info");
+      }
+      player.SendChatMessage("Group ID: " + gid);
+
+      player.SendChatMessage("Group " + GroupInfo[gid].name  + " member list:")
+      for(let i = 0; i < GroupInfo[gid].members.length; i++) {
+        player.SendChatMessage("Name: " + GroupInfo[gid].members[i] + " rank: " + GroupInfo[gid].membersrank[i]);
+      }
+      break;
+    }
+    default: {
+      player.SendChatMessage("You selected a invalid option");
+      return player.SendChatMessage("/group (create/invite/leave/kick/show)")
+    }
+  }
+});
+
+commands.set("shop", (player, args) => {
+  let product = args[0];
+  let quantity = parseInt(args[1]) || 1;
+
+  for(let i = 0; i < g_shops; i++) {
+
+    let sphere = new gm.utility.sphere(ShopInfo[i].position.x, ShopInfo[i].position.y, ShopInfo[i].position.z);
+    if(sphere.inRangeOfPoint(player.position)) {
+      if(product == null) {
+        player.SendChatMessage("Shop items:");
+        for(let c = 0; c < ShopInfo[i].items.length; c++) {
+          player.SendChatMessage(c + ": " + ShopInfo[i].items[c])
+        }
+        break;
+      } else {
+        if(isNaN(quantity)) return player.SendChatMessage("invalid quantity");
+        gm.utility.Shop.buy(player, product, quantity);
+      }
+      return true;
+      break;
+    }
+    return player.SendChatMessage("No shop here");
+  }
+
+  /*if(product == null) {
+    return false;
+  }*/
+});
+
 commands.set("disconnect", (player) => {
   player.Kick("Normal quit");
 });
 
 
-// -- TEST COMMANDS -- //
+/*
+                                                                                                                         
+  ,ad8888ba,   ,ad8888ba,   88b           d88 88b           d88        db        888b      88 88888888ba,    ad88888ba   
+ d8"'    `"8b d8"'    `"8b  888b         d888 888b         d888       d88b       8888b     88 88      `"8b  d8"     "8b  
+d8'          d8'        `8b 88`8b       d8'88 88`8b       d8'88      d8'`8b      88 `8b    88 88        `8b Y8,          
+88           88          88 88 `8b     d8' 88 88 `8b     d8' 88     d8'  `8b     88  `8b   88 88         88 `Y8aaaaa,    
+88           88          88 88  `8b   d8'  88 88  `8b   d8'  88    d8YaaaaY8b    88   `8b  88 88         88   `"""""8b,  
+Y8,          Y8,        ,8P 88   `8b d8'   88 88   `8b d8'   88   d8""""""""8b   88    `8b 88 88         8P         `8b  
+ Y8a.    .a8P Y8a.    .a8P  88    `888'    88 88    `888'    88  d8'        `8b  88     `8888 88      .a8P  Y8a     a8P  
+  `"Y8888Y"'   `"Y8888Y"'   88     `8'     88 88     `8'     88 d8'          `8b 88      `888 88888888Y"'    "Y88888P"   
+                                                                                                                         
+                                                                                                                         
+                                                                                                           
+                  88888888888 ,ad8888ba,   88888888ba     888888888888 88888888888 ad88888ba 888888888888  
+                  88         d8"'    `"8b  88      "8b         88      88         d8"     "8b     88       
+                  88        d8'        `8b 88      ,8P         88      88         Y8,             88       
+                  88aaaaa   88          88 88aaaaaa8P'         88      88aaaaa    `Y8aaaaa,       88       
+                  88"""""   88          88 88""""88'           88      88"""""      `"""""8b,     88       
+                  88        Y8,        ,8P 88    `8b           88      88                 `8b     88       
+                  88         Y8a.    .a8P  88     `8b          88      88         Y8a     a8P     88       
+                  88          `"Y8888Y"'   88      `8b         88      88888888888 "Y88888P"      88       
+                                                                                                           
+Shandy-Life test commands.
+
+All of this commands are for debuging purposes.
+
+*/
 
 commands.set("jsontest", (player) => {
 
@@ -874,3 +1137,75 @@ commands.set("playerprops", (player) => {
 /*commands.set("shop", (player) => {
 
 });*/
+
+commands.set("additem", (player, args) => {
+
+  let item = args[0];
+  let quantity = parseInt(parseInt(args[1]));
+
+  if(isNaN(quantity)) return player.SendChatMessage("Quantity must be a number");
+
+  /*PlayerInventory[player.name].objects.push(item);
+  PlayerInventory[player.name].objectsQuantity.push(quantity);
+  */
+
+  let objitem = new gm.utility.Item(item, quantity);
+
+  objitem.give(player);
+
+  player.SendChatMessage("Added Item: " + item + " quantity: " + quantity);
+
+});
+
+commands.set("removeitem", (player, args) => {
+
+  let item = args[0];
+  let quantity = parseInt(parseInt(args[1]));
+
+  if(isNaN(quantity)) return player.SendChatMessage("Quantity must be a number");
+
+  let objitem = new gm.utility.Item(item, quantity);
+  objitem.remove(player);
+
+  player.SendChatMessage("Removed Item: " + item + " quantity: " + quantity);
+
+});
+
+commands.set("inventory", (player) => {
+
+  let itemCount = PlayerInventory[player.name].objects.length;
+
+  player.SendChatMessage("Player inventory: " + "( " + itemCount + " ) Weight: (" + PlayerInventory[player.name].weight + "/" + PlayerInventory[player.name].maxWeight + ")");
+  for(let i = 0; i < itemCount; i++) {
+    let itemWeight = gm.utility.Item.findByName(gm.items, PlayerInventory[player.name].objects[i]);
+    player.SendChatMessage(" Item: " + PlayerInventory[player.name].objects[i] + " quantity: " + PlayerInventory[player.name].objectsQuantity[i] + " weight: " + (itemWeight.w * PlayerInventory[player.name].objectsQuantity[i]));
+  }
+
+  //console.log(Object.keys(PlayerInventory[player.name].objects))
+
+});
+
+
+
+commands.set("split", (player) => {
+
+  let someString = "a,b,c,d,e,f";
+
+  let result = someString.split(",");
+
+  for(let i = 0; i < result.length; i++) {
+    player.SendChatMessage( i + ": " + result[i]);
+  }
+});
+
+
+
+commands.set("showallgroups", (player,args) => {
+  
+  for(let i = 1; i <= g_groups; i++) {
+    player.SendChatMessage("INDEX: " + i);
+    player.SendChatMessage("ID: " + GroupInfo[i].id);
+    player.SendChatMessage("Members: " + JSON.stringify(GroupInfo[i].members))
+    player.SendChatMessage("Members: " + JSON.stringify(GroupInfo[i].membersrank))
+  }
+});

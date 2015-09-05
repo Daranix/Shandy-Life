@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-08-2015 a las 00:31:47
+-- Tiempo de generación: 02-09-2015 a las 18:13:43
 -- Versión del servidor: 5.6.25
 -- Versión de PHP: 5.6.11
 
@@ -29,10 +29,23 @@ SET time_zone = "+00:00";
 CREATE TABLE IF NOT EXISTS `cars` (
   `carid` int(11) NOT NULL,
   `ownerid` int(11) NOT NULL,
-  `modelid` int(11) NOT NULL,
+  `modelid` text NOT NULL,
   `posx` float NOT NULL,
   `posy` float NOT NULL,
   `posz` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `groups`
+--
+
+CREATE TABLE IF NOT EXISTS `groups` (
+  `id` int(11) NOT NULL,
+  `name` text NOT NULL,
+  `members` text NOT NULL,
+  `membersrank` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -51,6 +64,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `factionrank` int(11) NOT NULL DEFAULT '0',
   `licenses` text NOT NULL,
   `phone` int(11) NOT NULL DEFAULT '0',
+  `groupid` int(11) NOT NULL DEFAULT '0',
   `posx` float NOT NULL,
   `posy` float NOT NULL,
   `posz` float NOT NULL
@@ -67,6 +81,12 @@ ALTER TABLE `cars`
   ADD PRIMARY KEY (`carid`);
 
 --
+-- Indices de la tabla `groups`
+--
+ALTER TABLE `groups`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `users`
 --
 ALTER TABLE `users`
@@ -81,6 +101,11 @@ ALTER TABLE `users`
 --
 ALTER TABLE `cars`
   MODIFY `carid` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT de la tabla `groups`
+--
+ALTER TABLE `groups`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `users`
 --

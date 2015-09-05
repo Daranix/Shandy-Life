@@ -143,6 +143,7 @@ Events.onPlayerCreated = player => {
     faction: 0,
     factionrank: 0,
     phone: 0,
+    groupid: 0,
     licenses: {
       car: false,
       boat: false,
@@ -152,13 +153,13 @@ Events.onPlayerCreated = player => {
     },
   };
 
-  /*PlayerInventory[player.name] = {
-    objects: {},
-    objectsQuantity: {},
+  PlayerInventory[player.name] = {
+    objects: [],
+    objectsQuantity: [],
     weight: 0,
     maxWeight: 64
 
-  };*/
+  };
 
   console.log("Player " + player.name + " has successfully joined the server.");
 
@@ -282,6 +283,7 @@ Events.onPlayerUpdate = (player, callback, info) => {
   " ,faction=" + PlayerInfo[player.name].faction +
   " ,licenses='" + jsonString + "'" +
   " ,phone=" + PlayerInfo[player.name].phone +
+  " ,groupid=" + PlayerInfo[player.name].groupid +
   " WHERE id = " + PlayerInfo[player.name].id;
 
   connection.query(SQLQuery, function(err) {
@@ -289,11 +291,11 @@ Events.onPlayerUpdate = (player, callback, info) => {
       gm.utility.print("An error ocurred trying to upload the info of " + player.name);
       gm.utility.print("QUERY: " + SQLQuery);
       gm.utility.print("[ERROR]: " + err);
-      callback(false);
+      if(callback) callback(false);
       //player.SendChatMessage(gm.utility.timestamp() + " An error ocurred trying to upload your player info, please contact and administrator");
     } else {
       if(info) { gm.utility.print("player data of " + player.name + " has been updated " + info); }
-      callback(true);
+      if(callback) callback(true);
     }
   });
 
@@ -370,6 +372,7 @@ Events.onPlayerLogin = (player, dbData) => {
     faction: dbData.faction,
     factionrank: dbData.factionrank,
     phone: dbData.phone,
+    groupid: dbData.groupid,
     licenses: parsedLicenses /*{
       car: false,
       boat: false,
