@@ -6,7 +6,7 @@ If you have any questions try looking the [wiki](https://github.com/Daranix/Shan
 
 # Changelog
 
-### 0.5 (commit)[https://github.com/Daranix/Shandy-Life/commit/fae92145ee58fe49a14f8ef7d34d9abe2df96d66]
+### 0.5 [commit](https://github.com/Daranix/Shandy-Life/commit/fae92145ee58fe49a14f8ef7d34d9abe2df96d66)
 
 - Added virtual inventory system
 - Added shop system "easy maker"
