@@ -6,6 +6,12 @@ If you have any questions try looking the [wiki](https://github.com/Daranix/Shan
 
 # Changelog
 
+### 0.5
+
+- Added virtual inventory system
+- Added shop system "easy maker"
+- Added group system (thanks to myami contributions ^^)
+
 ### 0.4
 
 - Added vehicle spawn from database (basic)
