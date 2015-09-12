@@ -59,6 +59,7 @@ Events.onClientConnected = client => {
  * @param {Client} client the new client
  * @param {integer} reason disconnect reason
  */
+
 Events.onClientDisconnected = (client, reason) => {
   console.log("Client (ip: " + client.ipAddress + ") disconnected. Reason: " + (reason === 1 ? "Timeout" : "Normal quit"));
 };
@@ -259,7 +260,9 @@ Events.onPlayerShot = player => {
  *
  * @param {Player} player the leaving player
  */
+ 
 Events.onPlayerDestroyed = player => {
+  if(pLogged[player.name]) { Events.onPlayerUpdate(player); }
   console.log("Player " + player.name + " is leaving the server.");
 };
 

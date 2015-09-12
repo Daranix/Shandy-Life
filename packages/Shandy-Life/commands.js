@@ -1,12 +1,12 @@
 /*
- 
-  _|_|_|  _|                                  _|                _|        _|      _|_|            
-_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|    
-  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|  
-      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|        
-_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|  
-                                                        _|                                        
-                                                    _|_| 
+
+  _|_|_|  _|                                  _|                _|        _|      _|_|
+_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|
+  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|
+      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|
+_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|
+                                                        _|
+                                                    _|_|
  *****************************************************************
  * @overview GTA:Multiplayer Shandy Life - Roleplay: commands    *
  * @author "Daranix" & Jan "Waffle" C.                           *
@@ -91,7 +91,7 @@ commands.set("weather", (player, args) => {
 });
 
 commands.set('giveMoney', (player, args) => {
-  
+
   if(PlayerInfo[player.name].adminlvl <= 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
@@ -141,11 +141,11 @@ commands.set("register", (player, args) => {
   }
 
   let connection = gm.utility.dbConnect();
-  
+
   connection.connect();
 
   connection.query("SELECT name FROM users WHERE name = " + connection.escape(player.name), function(err, results) {
-    
+
     let numRows = results.length;
 
     if(numRows >= 1) {
@@ -153,10 +153,10 @@ commands.set("register", (player, args) => {
       return player.SendChatMessage("You was already registered sign in with: /login [Password]");
     }
   });
-  
-  if(ConfirmReg[player.name]) 
+
+  if(ConfirmReg[player.name])
   {
-    if(ConfirmPwd[player.name] == password) 
+    if(ConfirmPwd[player.name] == password)
     {
       let salt = gm.config.mysql.salt;
       password = password + salt;
@@ -172,7 +172,7 @@ commands.set("register", (player, args) => {
       console.log("Hash created: " + pwdhash);
       let SQLQuery = "INSERT INTO users (name, password) VALUES (" + playername + "," + pwdhash + ");";
       connection.query(SQLQuery, function(err) {
-        
+
         if(!err) {
             console.log("user "+ player.name + " registered sucesfull \n\n");
             player.SendChatMessage("You was been registered sucesfull");
@@ -213,8 +213,8 @@ commands.set("register", (player, args) => {
       ConfirmPwd[player.name] = "";
       ConfirmReg[player.name] = false;
     }
-    
-  } else {  
+
+  } else {
     ConfirmPwd[player.name] = password;
     ConfirmReg[player.name] = true;
     player.SendChatMessage("To confirm the password write again /register [password]");
@@ -223,11 +223,11 @@ commands.set("register", (player, args) => {
 });
 
 commands.set("login", (player, args) => {
-  
+
   if(!Registered[player.name]) {
     return player.SendChatMessage("You wasn't not registered, please first /register [password]");
   } else {
-    
+
     let password = args.join(" ");
 
     let connection = gm.utility.dbConnect();
@@ -242,11 +242,11 @@ commands.set("login", (player, args) => {
     console.log(SQLQuery);
 
     connection.query(SQLQuery, function(err, results) {
-      
+
       let num_rows = results.length;
 
       if(num_rows >= 1) {
-        
+
         if(results[0].banned) {
           player.Kick("You was banned from the server");
         }
@@ -280,7 +280,7 @@ commands.set("stats", (player) => {
 });
 
 commands.set("kick", (player, args) => {
-  
+
 
   if(PlayerInfo[player.name].adminlvl < 1) {
     return player.SendChatMessage(ERR_NO_ACCESS);
@@ -311,7 +311,7 @@ commands.set("kick", (player, args) => {
 });
 
 commands.set("ban", (player, args) => {
-  
+
   if (args.length === 0) {
     return player.SendChatMessage("USAGE: /ban [id or name] [Reason]", red);
   }
@@ -346,7 +346,7 @@ commands.set("ban", (player, args) => {
 });
 
 commands.set("promoteadmin", (player, args) => {
-  
+
   if(PlayerInfo[player.name].adminlvl < 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
@@ -387,14 +387,14 @@ commands.set("promoteadmin", (player, args) => {
       player.SendChatMessage("[ADMIN] You promoted " + targets[0].name + " to admin level: " + adminlvl);
       targets[0].SendChatMessage("[ADMIN] You was promoted to admin level " + adminlvl + " by " + player.name);
     } else {
-     player.SendChatMessage("[ERROR] An error ocurred when trying to upload player info of " + targets[0].name); 
+     player.SendChatMessage("[ERROR] An error ocurred when trying to upload player info of " + targets[0].name);
     }
   });
 
 });
 
 commands.set("promotefaction", (player, args) => {
-  
+
   if(PlayerInfo[player.name].adminlvl < 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
@@ -489,7 +489,7 @@ commands.set("licenses", (player) => {
 });
 
 commands.set("giveLicense", (player, args) => {
-  
+
   if(PlayerInfo[player.name].adminlvl < 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
@@ -544,14 +544,14 @@ commands.set("giveLicense", (player, args) => {
   });
 
 
-  
+
 
 
 
 });
 
 commands.set("removeLicense", (player, args) => {
-  
+
   if(PlayerInfo[player.name].adminlvl < 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
@@ -603,7 +603,7 @@ commands.set("removeLicense", (player, args) => {
     }
   });
 
-  
+
 
 });
 
@@ -630,16 +630,16 @@ commands.set("me", (player, args) => {
 });
 
 commands.set("call", (player, args) => {
-  
+
   if(PlayerInfo[player.name].phone == 0) {
     return player.SendChatMessage("You don't have a phone!");
   }
 
   if(pInCall[player.name]) {
 
-    if(pInCallNumber[player.name] != 911) 
+    if(pInCallNumber[player.name] != 911)
     {
-        for(let called of g_players) 
+        for(let called of g_players)
         {
           if(pInCall[called.name] == true && pInCallNumber[called.name] == PlayerInfo[player.name].phone)
           {
@@ -691,10 +691,10 @@ commands.set("call", (player, args) => {
 
 
 commands.set("hangon", (player) => {
-  
-  for(let caller of g_players) 
+
+  for(let caller of g_players)
   {
-    if(pInCall[caller.name] == true && pInCallNumber[caller.name] == PlayerInfo[player.name].phone) 
+    if(pInCall[caller.name] == true && pInCallNumber[caller.name] == PlayerInfo[player.name].phone)
     {
       pInCall[player.name] = true;
       pInCallNumber[player.name] = PlayerInfo[caller.name].phone;
@@ -709,7 +709,7 @@ commands.set("hangon", (player) => {
 
 
 commands.set("group", (player, args) => {
-  
+
   let option = args[0];
 
   switch(option) {
@@ -723,7 +723,7 @@ commands.set("group", (player, args) => {
 
       if(PlayerInfo[player.name].groupid >= 1) return player.SendChatMessage("You was already in a group");
 
-      let group = new gm.utility.Group(gname);
+      let group = new gm.rpsys.Group(gname);
       group.create(player);
       break;
     }
@@ -741,12 +741,12 @@ commands.set("group", (player, args) => {
 
         //let grid = GroupInvite[player.name];
 
-        gm.utility.Group.addmember(player, GroupInvite[player.name]);
+        gm.rpsys.Group.addmember(player, GroupInvite[player.name]);
 
         GroupInvite[player.name] = '';
         //player.SendChatMessage("New member to de group: " + player.name);
-        gm.utility.groupMessage(PlayerInfo[player.name].groupid, "New member to the group: " + player.name, new RGB(255,255,255));
-        return player.SendChatMessage("Welcome to the group: " + gm.utility.Group.findNameById(PlayerInfo[player.name].groupid));
+        gm.rpsys.groupMessage(PlayerInfo[player.name].groupid, "New member to the group: " + player.name, new RGB(255,255,255));
+        return player.SendChatMessage("Welcome to the group: " + gm.rpsys.Group.findNameById(PlayerInfo[player.name].groupid));
 
       }
 
@@ -754,7 +754,7 @@ commands.set("group", (player, args) => {
 
       if(args[1] == 'refuse') {
 
-         if(typeof GroupInvite[player.name] === 'undefined' || GroupInvite[player.name] == '') return player.SendChatMessage("You don't have a invitations to delince");
+        if(typeof GroupInvite[player.name] === 'undefined' || GroupInvite[player.name] == '') return player.SendChatMessage("You don't have a invitations to delince");
 
         GroupInvite[player.name] = '';
         return player.SendChatMessage("You delinced the invitation to the group: " + GroupInfo[GroupInvite[player.name]].name)
@@ -766,7 +766,7 @@ commands.set("group", (player, args) => {
 
       // Invite player
 
-      let gid = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+      let gid = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
 
       let index = GroupInfo[gid].members.indexOf(player.name); //GroupInfo[gid].membersrank.indexOf(GroupInfo[gid].members);
       let memberrank = GroupInfo[gid].membersrank[index];
@@ -802,23 +802,23 @@ commands.set("group", (player, args) => {
     }
 
     case 'leave': {
-      
+
       if(PlayerInfo[player.name].groupid == 0) return player.SendChatMessage("You dont have a group!");
-      
-      let groupName = gm.utility.Group.findNameById(PlayerInfo[player.name].groupid);
+
+      let groupName = gm.rpsys.Group.findNameById(PlayerInfo[player.name].groupid);
 
       player.SendChatMessage("You leaved from the group: " + groupName);
       // Send group message
-      let groupIndex = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+      let groupIndex = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
 
-      gm.utility.Group.removemember(player);//, groupIndex);
+      gm.rpsys.Group.removemember(player);//, groupIndex);
       break;
 
     }
     case 'kick': {
       if(PlayerInfo[player.name].groupid == 0 ) return player.SendChatMessage("You don't have a group!");
 
-      let indexGroup = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+      let indexGroup = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
 
       let indexRank = GroupInfo[indexGroup].members.indexOf(player.name);
 
@@ -842,7 +842,7 @@ commands.set("group", (player, args) => {
 
         if(PlayerInfo[player.name].groupid != PlayerInfo[targets[0].name].groupid) return player.SendChatMessage("This player wasn't in your group");
 
-        gm.utility.Group.removemember(targets[0]);
+        gm.rpsys.Group.removemember(targets[0]);
 
         player.SendChatMessage("You kicked: " + targets[0].name + " from the group");
         targets[0].SendChatMessage("You was kicked from the group " + GroupInfo[indexGroup].name + " by " + player.name);
@@ -850,10 +850,10 @@ commands.set("group", (player, args) => {
     }
 
     case 'promote': {
-      
+
       if(PlayerInfo[player.name].groupid == 0) return player.SendChatMessage("You aren't in a group");
 
-      let indexGroup = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
+      let indexGroup = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
 
       let indexRank = GroupInfo[indexGroup].members.indexOf(player.name);
 
@@ -894,8 +894,8 @@ commands.set("group", (player, args) => {
         return player.SendChatMessage("You aren't in a group");
       }
 
-      let gid = gm.utility.Group.findById(PlayerInfo[player.name].groupid);
-      if(!gid) { 
+      let gid = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
+      if(!gid) {
         player.SendChatMessage("Groups: " + g_groups)
         return player.SendChatMessage("Error when trying to get group info");
       }
@@ -914,20 +914,31 @@ commands.set("group", (player, args) => {
   }
 });
 
-commands.set("shop", (player, args) => {
+/*commands.set("shop", (player, args) => {
   let product = args[0];
   let quantity = parseInt(args[1]) || 1;
 
   for(let i = 0; i < g_shops; i++) {
 
     let sphere = new gm.utility.sphere(ShopInfo[i].position.x, ShopInfo[i].position.y, ShopInfo[i].position.z);
-    if(sphere.inRangeOfPoint(player.position)) {
-      if(product == null) {
-        player.SendChatMessage("Shop items:");
-        for(let c = 0; c < ShopInfo[i].items.length; c++) {
-          player.SendChatMessage(c + ": " + ShopInfo[i].items[c])
+    if(sphere.inRangeOfPoint(player.position))
+    {
+      if(product == null)
+      {
+        if(ShopInfo[i].type == "dealer") {
+          player.SendChatMessage("You can send the next items: ");
+          for(let c = 0; c < PlayerInventory[player.name].items.length; c++) {
+            if(gm.utility.isInArray(PlayerInventory[player.name].objects[c], ShopInfo[i].items)) {
+              player.SendChatMessage(PlayerInventory[player.name].objects[c]);
+            }
+          }
+        } else {
+          player.SendChatMessage("Shop items:");
+          for(let c = 0; c < ShopInfo[i].items.length; c++) {
+            player.SendChatMessage(c + ": " + ShopInfo[i].items[c])
+          }
+          break;
         }
-        break;
       } else {
         if(isNaN(quantity)) return player.SendChatMessage("invalid quantity");
         gm.utility.Shop.buy(player, product, quantity);
@@ -938,9 +949,127 @@ commands.set("shop", (player, args) => {
     return player.SendChatMessage("No shop here");
   }
 
-  /*if(product == null) {
-    return false;
-  }*/
+});*/
+
+commands.set("shop", (player, args) => {
+
+  let sphere;
+
+  for(let i = 0; i < g_shops; i++) {
+
+  sphere = new gm.utility.sphere(ShopInfo[i].position.x, ShopInfo[i].position.y, ShopInfo[i].position.z);
+
+  if(sphere.inRangeOfPoint(player.position)) {
+
+      //if(typeof args[0] === 'undefined') return player.SendChatMessage("Use: /shop (buy/sell/show)");
+      console.log(args[0]);
+      let option = "show";
+      if(typeof args[0] != 'undefined') { option = args[0].toLowerCase(); }
+
+      switch(option) {
+
+        case 'buy': {
+
+          if(ShopInfo[i].type == 'dealer') return player.SendChatMessage("You can't buy nothing here");
+
+          let product = args[1];
+          let quantity = parseInt(args[2]);
+
+          if(typeof product === 'undefined' || quantity <= 0 || typeof quantity === 'undefined' || isNaN(quantity)) return player.SendChatMessage("To buy use: /shop buy [item number or name] [quantity]");
+
+          if(isNaN(parseInt(product))) {
+            //if(isNaN(quantity)) return player.SendChatMessage("quantity must be a number");
+
+            gm.rpsys.Shop.buy(player, product, quantity)
+
+          } else {
+            if(isNaN(quantity)) return player.SendChatMessage("quantity must be a number");
+
+            let itemIndex = parseInt(product);
+
+            if(typeof ShopInfo[i].items[itemIndex] === 'undefined') return player.SendChatMessage("Item number not valid");
+
+            gm.rpsys.Shop.buy(player, ShopInfo[i].items[itemIndex], quantity);
+
+          }
+          break;
+        }
+
+        case 'sell': {
+
+          let product = args[1];
+          let quantity = parseInt(args[2]);
+
+          if(typeof product === 'undefined' || quantity <= 0 || typeof quantity === 'undefined' || isNaN(quantity)) return player.SendChatMessage("To sell use: /shop sell [item number or name] [quantity]");
+
+          if(isNaN(parseInt(product))) {
+            gm.rpsys.Shop.sell(player, product, quantity);
+          } else {
+            let sellItem = [];
+
+            for(let c = 0; c < PlayerInventory[player.name].objects; c++) {
+              if(gm.utility.isInArray(PlayerInventory[player.name].objects[c], ShopInfo[i].items)) {
+                sellItem.push(PlayerInventory[player.name].objects[c]);
+              }
+            }
+
+              let indexItem = parseInt(product);
+
+              if(ShopInfo[i].type == 'dealer') {
+                gm.rpsys.Shop.sell(player, sellItem[indexItem], quantity);
+              } else {
+                gm.rpsys.Shop.sell(player, ShopInfo[i].items[indexItem], quantity);
+              }
+
+            }
+            break;
+          }
+
+        case 'show':
+        default: {
+
+          if(ShopInfo[i].type == 'dealer') {
+            player.SendChatMessage(" You can sell the next things here: (use /shop sell [item number or name] [quantity]");
+            let count = 0;
+            for(let c = 0; c < PlayerInventory[player.name].objects; c++) {
+              if(gm.utility.isInArray(PlayerInventory[player.name].objects[c], ShopInfo[i].items)) {
+                player.SendChatMessage(count + ": " + PlayerInventory[player.name].objects[c]);
+                count++;
+              }
+            }
+
+          } else {
+            player.SendChatMessage("Items of the shop (use: /shop sell | buy [item number or name] [quantity]")
+            for(let c = 0; c < ShopInfo[i].items.length; c++) {
+              player.SendChatMessage(c + ": " + ShopInfo[i].items[c]);
+            }
+
+          }
+          break;
+        }
+
+      } // options switch end
+      return true;
+    } // position Check end
+  } // for end
+
+  return player.SendChatMessage("You aren't in a shop");
+
+});
+
+
+commands.set("inventory", (player) => {
+
+  let itemCount = PlayerInventory[player.name].objects.length;
+
+  player.SendChatMessage("Player inventory: " + "( " + itemCount + " ) Weight: (" + PlayerInventory[player.name].weight + "/" + PlayerInventory[player.name].maxWeight + ")");
+  for(let i = 0; i < itemCount; i++) {
+    let itemWeight = gm.rpsys.Item.findByName(gm.items, PlayerInventory[player.name].objects[i]);
+    player.SendChatMessage(" Item: " + PlayerInventory[player.name].objects[i] + " quantity: " + PlayerInventory[player.name].objectsQuantity[i] + " weight: " + (itemWeight.w * PlayerInventory[player.name].objectsQuantity[i]));
+  }
+
+  //console.log(Object.keys(PlayerInventory[player.name].objects))
+
 });
 
 commands.set("disconnect", (player) => {
@@ -949,27 +1078,27 @@ commands.set("disconnect", (player) => {
 
 
 /*
-                                                                                                                         
-  ,ad8888ba,   ,ad8888ba,   88b           d88 88b           d88        db        888b      88 88888888ba,    ad88888ba   
- d8"'    `"8b d8"'    `"8b  888b         d888 888b         d888       d88b       8888b     88 88      `"8b  d8"     "8b  
-d8'          d8'        `8b 88`8b       d8'88 88`8b       d8'88      d8'`8b      88 `8b    88 88        `8b Y8,          
-88           88          88 88 `8b     d8' 88 88 `8b     d8' 88     d8'  `8b     88  `8b   88 88         88 `Y8aaaaa,    
-88           88          88 88  `8b   d8'  88 88  `8b   d8'  88    d8YaaaaY8b    88   `8b  88 88         88   `"""""8b,  
-Y8,          Y8,        ,8P 88   `8b d8'   88 88   `8b d8'   88   d8""""""""8b   88    `8b 88 88         8P         `8b  
- Y8a.    .a8P Y8a.    .a8P  88    `888'    88 88    `888'    88  d8'        `8b  88     `8888 88      .a8P  Y8a     a8P  
-  `"Y8888Y"'   `"Y8888Y"'   88     `8'     88 88     `8'     88 d8'          `8b 88      `888 88888888Y"'    "Y88888P"   
-                                                                                                                         
-                                                                                                                         
-                                                                                                           
-                  88888888888 ,ad8888ba,   88888888ba     888888888888 88888888888 ad88888ba 888888888888  
-                  88         d8"'    `"8b  88      "8b         88      88         d8"     "8b     88       
-                  88        d8'        `8b 88      ,8P         88      88         Y8,             88       
-                  88aaaaa   88          88 88aaaaaa8P'         88      88aaaaa    `Y8aaaaa,       88       
-                  88"""""   88          88 88""""88'           88      88"""""      `"""""8b,     88       
-                  88        Y8,        ,8P 88    `8b           88      88                 `8b     88       
-                  88         Y8a.    .a8P  88     `8b          88      88         Y8a     a8P     88       
-                  88          `"Y8888Y"'   88      `8b         88      88888888888 "Y88888P"      88       
-                                                                                                           
+
+  ,ad8888ba,   ,ad8888ba,   88b           d88 88b           d88        db        888b      88 88888888ba,    ad88888ba
+ d8"'    `"8b d8"'    `"8b  888b         d888 888b         d888       d88b       8888b     88 88      `"8b  d8"     "8b
+d8'          d8'        `8b 88`8b       d8'88 88`8b       d8'88      d8'`8b      88 `8b    88 88        `8b Y8,
+88           88          88 88 `8b     d8' 88 88 `8b     d8' 88     d8'  `8b     88  `8b   88 88         88 `Y8aaaaa,
+88           88          88 88  `8b   d8'  88 88  `8b   d8'  88    d8YaaaaY8b    88   `8b  88 88         88   `"""""8b,
+Y8,          Y8,        ,8P 88   `8b d8'   88 88   `8b d8'   88   d8""""""""8b   88    `8b 88 88         8P         `8b
+ Y8a.    .a8P Y8a.    .a8P  88    `888'    88 88    `888'    88  d8'        `8b  88     `8888 88      .a8P  Y8a     a8P
+  `"Y8888Y"'   `"Y8888Y"'   88     `8'     88 88     `8'     88 d8'          `8b 88      `888 88888888Y"'    "Y88888P"
+
+
+
+                  88888888888 ,ad8888ba,   88888888ba     888888888888 88888888888 ad88888ba 888888888888
+                  88         d8"'    `"8b  88      "8b         88      88         d8"     "8b     88
+                  88        d8'        `8b 88      ,8P         88      88         Y8,             88
+                  88aaaaa   88          88 88aaaaaa8P'         88      88aaaaa    `Y8aaaaa,       88
+                  88"""""   88          88 88""""88'           88      88"""""      `"""""8b,     88
+                  88        Y8,        ,8P 88    `8b           88      88                 `8b     88
+                  88         Y8a.    .a8P  88     `8b          88      88         Y8a     a8P     88
+                  88          `"Y8888Y"'   88      `8b         88      88888888888 "Y88888P"      88
+
 Shandy-Life test commands.
 
 All of this commands are for debuging purposes.
@@ -1009,11 +1138,11 @@ commands.set("checkpos", (player) => {
   } else {
     player.SendChatMessage("NOPE");
   }
-  
+
 });
 
 commands.set("checkpos2", (player) => {
-  
+
   var sphere = new gm.utility.sphere(3360.19, -4849.67, 111.8, 10.0);
 
 
@@ -1022,6 +1151,22 @@ commands.set("checkpos2", (player) => {
   } else {
     player.SendChatMessage("FALSE");
   }
+
+});
+
+commands.set("setpos", (player, args) => {
+  let newpost = new Vector3f(parseFloat(args[0]), parseFloat(args[1]), parseFloat(args[2]));
+
+  player.position = newpost;
+
+  player.SendChatMessage("Your position has been changed to X: " + args[0] + " Y: " + args[1] + " Z: " + args[2]);
+
+});
+
+commands.set("getdistance", (player) => {
+
+  let distance = gm.utility.GetPlayerDistanceToPoint(player, 3360.19, -4849.67, 111.8);
+  player.SendChatMessage("Distance to point is: " + distance);
 
 });
 
@@ -1037,7 +1182,7 @@ let veh;
 commands.set("spawnveh", (player, args) => {
 
   let model = args.join(" ");
-  
+
   if(model == null) {
     return player.SendChatMessage("Put a fucking model");
   }
@@ -1060,7 +1205,7 @@ commands.set("spawnveh", (player, args) => {
     owner: player.name,
     vmodel: model
   }*/
-  
+
   console.log("Veh networkId: " + vehicle.networkId);
 
   /*veh = vehicle;
@@ -1098,7 +1243,7 @@ commands.set("playerprops", (player) => {
   var playerprops = Object.keys(player);
   var fplayerprops = playerprops//.replace(",","\n")
   //console.log("\n\n" + fplayerprops.replace(","," "));
-  
+
   /*console.log("\n\n");
   console.log("Player Props:");
   console.log(playerprops);
@@ -1149,7 +1294,7 @@ commands.set("additem", (player, args) => {
   PlayerInventory[player.name].objectsQuantity.push(quantity);
   */
 
-  let objitem = new gm.utility.Item(item, quantity);
+  let objitem = new gm.rpsys.Item(item, quantity);
 
   objitem.give(player);
 
@@ -1164,24 +1309,10 @@ commands.set("removeitem", (player, args) => {
 
   if(isNaN(quantity)) return player.SendChatMessage("Quantity must be a number");
 
-  let objitem = new gm.utility.Item(item, quantity);
+  let objitem = new gm.rpsys.Item(item, quantity);
   objitem.remove(player);
 
   player.SendChatMessage("Removed Item: " + item + " quantity: " + quantity);
-
-});
-
-commands.set("inventory", (player) => {
-
-  let itemCount = PlayerInventory[player.name].objects.length;
-
-  player.SendChatMessage("Player inventory: " + "( " + itemCount + " ) Weight: (" + PlayerInventory[player.name].weight + "/" + PlayerInventory[player.name].maxWeight + ")");
-  for(let i = 0; i < itemCount; i++) {
-    let itemWeight = gm.utility.Item.findByName(gm.items, PlayerInventory[player.name].objects[i]);
-    player.SendChatMessage(" Item: " + PlayerInventory[player.name].objects[i] + " quantity: " + PlayerInventory[player.name].objectsQuantity[i] + " weight: " + (itemWeight.w * PlayerInventory[player.name].objectsQuantity[i]));
-  }
-
-  //console.log(Object.keys(PlayerInventory[player.name].objects))
 
 });
 
@@ -1201,11 +1332,40 @@ commands.set("split", (player) => {
 
 
 commands.set("showallgroups", (player,args) => {
-  
+
   for(let i = 1; i <= g_groups; i++) {
     player.SendChatMessage("INDEX: " + i);
     player.SendChatMessage("ID: " + GroupInfo[i].id);
     player.SendChatMessage("Members: " + JSON.stringify(GroupInfo[i].members))
     player.SendChatMessage("Members: " + JSON.stringify(GroupInfo[i].membersrank))
   }
+});
+
+
+commands.set("jobs", (player,args) => {
+/*  if(PlayerInfo[player.name].jobs != 0) {
+    return player.SendChatMessage("You don't have acces to this commands");
+  }*/
+  if (args.length < 1) {
+    return player.SendChatMessage("Use: /jobs [jobs name])");
+  }
+
+  var job = ["None","LSPD","Mafia","truckdriver","Taxidriver","airplanepilot","helicopterpilot"];
+   console.log("ARGS = " + args[0]);
+  if(!gm.utility.isInArray(args[0], job)) return player.SendChatMessage("Not valid job!");
+
+
+  var n = job.indexOf(args[0]);
+
+  if(n == 0) return player.SendChatMessage("not valid job!");
+
+  //PlayerInfo[player.name].jobs = n;
+
+      player.SendChatMessage("Gived job to player with ID 0")
+
+
+});
+
+commands.set("farm", (player) => {
+  gm.rpsys.farm.pick(player);
 });

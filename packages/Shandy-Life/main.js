@@ -1,12 +1,11 @@
 /*
- 
-  _|_|_|  _|                                  _|                _|        _|      _|_|            
-_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|    
-  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|  
-      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|        
-_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|  
-                                                        _|                                        
-                                                    _|_| 
+  _|_|_|  _|                                  _|                _|        _|      _|_|
+_|        _|_|_|      _|_|_|  _|_|_|      _|_|_|  _|    _|      _|              _|        _|_|
+  _|_|    _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|  _|_|_|_|  _|_|_|_|
+      _|  _|    _|  _|    _|  _|    _|  _|    _|  _|    _|      _|        _|    _|      _|
+_|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    _|        _|_|_|
+                                                        _|
+                                                    _|_|
  *****************************************************************
  * @overview GTA:Multiplayer Shandy Life - Roleplay: Main File   *
  * @authors "Daranix" & Jan "Waffle" C.                          *
@@ -34,14 +33,7 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
  * @namespace
  */
 
-//Data player vars
-/*global.pAdmin     = [];
-global.pMoney     = [];
-global.pFaction   = [];
-global.pId        = [];*/
-//global.pLicenses  = [[],[]];
-
-// PlayerInfo definition
+//Basic player global variables
 global.PlayerInfo = [];
 global.PlayerInventory = [];
 
@@ -61,21 +53,24 @@ global.ShopInfo = [];
 // Group system variables
 global.g_groups = 0;
 global.GroupInfo = [];
+// Farm system variables
+global.g_farmpoints = 0;
+global.FarmPoint = [];
 
 
 // Timers of call system
-global.TimerRing = [];
+global.TimerRing  = [];
 global.gTimerRing = [];
 
 //Assoc faction ID to name
 global.FactionName = ["none",    // 0
                       "Police"]; // 1
-//Assoc license to a good name
-global.LicenseName = ["Drive license", // car
-                      "Boat license",  // boat
-                      "Truck license",  // truck
-                      "Helicopter pilot license", // pilot_helicopter 
-                      "Plane pilot license"]; // pilot_plane
+//Assoc license to a name
+global.LicenseName = ["Drive license", // car 0
+                      "Boat license",  // boat 1
+                      "Truck license",  // truck 2
+                      "Helicopter pilot license", // pilot_helicopter 3
+                      "Plane pilot license"]; // pilot_plane 4
 
 global.gm = {
   config:   require('./config.js'),
@@ -83,7 +78,8 @@ global.gm = {
   utility:  require('./utility.js'),
   mysql:    require('./node_modules/mysql'),
   md5:      require('./node_modules/md5'),
-  items:    require('./inventory.js')
+  items:    require('./inventory.js'),
+  rpsys:   require('./roleplay_systems/systems')
   //fs:       require('./node_modules/writable-file-stream') // ONLY WRITE
 };
 
@@ -91,21 +87,23 @@ global.gm = {
  * The main function of this package.
  */
 
-function main () {
-  
+function main() {
+
   gm.utility.print("Registering Events...");
   gm.events.register();
 
   // Load shop system
-  gm.utility.LoadShops();
+  //gm.utility.LoadShops();
+  gm.rpsys.LoadShops();
+  gm.rpsys.LoadFarms();
 
   // ---- This is for check database connection and spawn vehicles ----- //
 
-  let testdb = gm.utility.dbConnect(); 
+  let testdb = gm.utility.dbConnect();
 
   testdb.connect(function(err) {
     if(err) {
-      console.log("Error connecting to the database ... ")
+      console.log("Error connecting to the database ... ");
       throw err;
     } else {
       console.log('Database connected!')
@@ -113,7 +111,8 @@ function main () {
   });
 
   gm.utility.LoadVehicles(testdb); // Spawn the vehicles
-  gm.utility.LoadGroups(testdb); // Spawn groups
+  gm.rpsys.LoadGroups(testdb); // Load groups
+
   testdb.end();
 
   // ----------------------------------------------------------------- //
@@ -124,20 +123,16 @@ function main () {
   setInterval(function() { gm.events.updateAllPlayers(); }, updateInterval);
 
   console.log("+==============================================================+");
-  console.log("  _______ __                   __        ___    __  ___");       
+  console.log("  _______ __                   __        ___    __  ___");
   console.log(" |   _   |  |--.---.-.-----.--|  .--.--.|   |  |__.'  _.-----.");
   console.log(" |   1___|     |  _  |     |  _  |  |  ||.  |  |  |   _|  -__|");
   console.log(" |____   |__|__|___._|__|__|_____|___  ||.  |__|__|__| |_____|");
-  console.log(" |:  1   |                       |_____||:  1   | ");            
-  console.log(" |::.. . |                              |::.. . | ");            
-  console.log(" `-------'                              `-------' ");   
+  console.log(" |:  1   |                       |_____||:  1   | ");
+  console.log(" |::.. . |                              |::.. . | ");
+  console.log(" `-------'                              `-------' ");
   console.log("+=============================================================+");
   gm.utility.print("Server started!");
-  
+
 }
 
 main();
-
-
-
-
