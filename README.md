@@ -6,6 +6,13 @@ If you have any questions try looking the [wiki](https://github.com/Daranix/Shan
 
 # Changelog
 
+### [0.6](https://github.com/Daranix/Shandy-Life/commit/28c45ec6fa7377e09e337090f35d9e8b307f3898)
+
+- Some improvements to the new systems added
+- Added sell option on shop system
+- Added a new type of shop (dealer)
+- I move the systems to diferents files to have better order on the code.
+
 ### [0.5](https://github.com/Daranix/Shandy-Life/commit/fae92145ee58fe49a14f8ef7d34d9abe2df96d66)
 
 - Added virtual inventory system
