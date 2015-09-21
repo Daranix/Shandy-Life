@@ -6,6 +6,11 @@ If you have any questions try looking the [wiki](https://github.com/Daranix/Shan
 
 # Changelog
 
+### [0.7](https://github.com/Daranix/Shandy-Life/commit/34c3a6fe01e249f675c55af6d66b4b476deb60e6)
+
+- Added house system 0.1
+- Added farm system 
+
 ### [0.6](https://github.com/Daranix/Shandy-Life/commit/28c45ec6fa7377e09e337090f35d9e8b307f3898)
 
 - Some improvements to the new systems added
