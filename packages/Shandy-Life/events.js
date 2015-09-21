@@ -49,6 +49,7 @@ Events.register = () => {
  *
  * @param {Client} client the new client
  */
+
 Events.onClientConnected = client => {
   console.log("Client (ip: " + client.ipAddress + ") connected.");
 };
@@ -159,7 +160,6 @@ Events.onPlayerCreated = player => {
     objectsQuantity: [],
     weight: 0,
     maxWeight: 64
-
   };
 
   console.log("Player " + player.name + " has successfully joined the server.");
@@ -297,7 +297,7 @@ Events.onPlayerUpdate = (player, callback, info) => {
       if(callback) callback(false);
       //player.SendChatMessage(gm.utility.timestamp() + " An error ocurred trying to upload your player info, please contact and administrator");
     } else {
-      if(info) { gm.utility.print("player data of " + player.name + " has been updated " + info); }
+      if(info) { gm.utility.print("player data of " + player.name + " has been updated."); }
       if(callback) callback(true);
     }
   });
@@ -310,18 +310,41 @@ Events.updateAllPlayers = () => {
   let loggedPlayers = 0;
   if(g_players.length >= 1) 
   {
-     console.log("Uploading all players info...");
+    let connection = gm.utility.dbConnect();
+    connection.connect();
+
+    console.log("Uploading all players info...");
     for (let player of g_players) 
     {
       if(pLogged[player.name]) 
       {
-        Events.onPlayerUpdate(player,function(){},false);
+        //Events.onPlayerUpdate(player,function(){},false);
+        let jsonString = JSON.stringify(PlayerInfo[player.name].licenses);
+        let SQLQuery = "UPDATE users SET" +
+        " adminlvl=" + PlayerInfo[player.name].adminlvl +
+        " ,faction=" + PlayerInfo[player.name].faction +
+        " ,licenses='" + jsonString + "'" +
+        " ,phone=" + PlayerInfo[player.name].phone +
+        " ,groupid=" + PlayerInfo[player.name].groupid +
+        " ,posx=" + player.position.x +
+        " ,posy=" + player.position.y +
+        " ,posz=" + player.position.z +
+        " WHERE id = " + PlayerInfo[player.name].id;
+
+        connection.query(SQLQuery, function(err) {
+          if(err) {
+            gm.utility.print("An error ocurred trying to upload the info of " + player.name);
+            gm.utility.print("QUERY: " + SQLQuery);
+            gm.utility.print("[ERROR]: " + err);
+            //player.SendChatMessage(gm.utility.timestamp() + " An error ocurred trying to upload your player info, please contact and administrator");
+          }
+        });
+
         loggedPlayers++;
       }
     }
-
+    connection.end();
     console.log("info of all players (" + loggedPlayers + ") has been uploaded");
-
   }
 };
 
@@ -358,14 +381,6 @@ Events.onPlayerLogin = (player, dbData) => {
   }
 
   // ---- 
-
-  /*if(dbLicenseslength == lengthLicenses) {
-    parsedLicenses = JSON.parse(dbData.licenses);
-  } else {
-    parsedLicenses = PlayerInfo[player.name].licenses;
-  }*/
-
-  //let parsedLicenses = JSON.parse(dbData.licenses);
 
   // Put values to the player
 

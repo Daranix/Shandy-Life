@@ -30,13 +30,13 @@ module.exports = {
     rainLevel: 0.0,
     snowLevel: 0.0,
     timeScale: 1.0,
-    IPLs: ['shr_int'],
+    IPLs: ['shr_int', 'FIBlobby', 'bh1_47_joshhse_firevfx', 'jewel2fake', 'RC12B_HospitalInterior'],
     interiors: [],
     capInteriors: true
   },
   
   mysql: {
-    host     : '127.0.0.1',
+    host     : '192.168.0.200',
     user     : 'root',
     password : 'root',
     database : 'roleplay',

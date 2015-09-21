@@ -9,6 +9,7 @@
 let peds = require('./peds');
 let weapons = require('./weapons');
 let vehicles = require('./vehicles');
+let objects = require('./objects');
 
 class Hashes {
   /**
@@ -35,7 +36,14 @@ class Hashes {
   static get vehicles() {
     return vehicles;
   }
-
+  /**
+   * Returns all Objects hashes (and their names, see objects.js)
+   *
+   * @returns {Array} array of all object models
+   */
+  static get objects() {
+    return objects;
+  }
   /**
    * Finds a certain hash by its name
    *

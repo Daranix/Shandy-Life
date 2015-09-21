@@ -1369,3 +1369,41 @@ commands.set("jobs", (player,args) => {
 commands.set("farm", (player) => {
   gm.rpsys.farm.pick(player);
 });
+
+
+
+//Check the chance function used on farm system.
+
+commands.set("checkchances", (player) => {
+  let chances = [99, 1];
+  let tryes = 0;
+  let index = 0;
+  
+
+  player.SendChatMessage("index: " + index);
+  while(FarmPoint[0].items[index] == "shit") {
+    index = gm.rpsys.farm.randexec(chances);
+    player.SendChatMessage("Item " + FarmPoint[0].items[index] + " quantity: " + FarmPoint[0].quantity[index])
+    tryes++;
+  }
+  player.SendChatMessage("Number of tries: " + tryes);
+  //return player.SendChatMessage("Item " + FarmPoint[0].items[index] + " quantity: " + FarmPoint[0].quantity[index])
+
+});
+
+commands.set("clearInventory", (player) => {
+  PlayerInventory[player.name].items    = [];
+  PlayerInventory[player.name].quantity = [];
+});
+
+commands.set("house", (player, args) => {
+  let option = args[0];
+
+  switch(option) {
+    case 'enter': gm.rpsys.house.enter(player); break;
+    case 'buy': gm.rpsys.house.buy(player); break;
+    case 'sell': gm.rpsys.house.sell(player); break;
+    case 'enter': gm.rpsys.house.enter(player); break;
+    default: player.SendChatMessage("use: /house (enter/buy/sell)"); break;
+  }
+});

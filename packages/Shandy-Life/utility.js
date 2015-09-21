@@ -16,6 +16,7 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
 
 let Utility = module.exports;
 Utility.hashes = require('./hashes/hashes');
+Utility.interiors = require('./interiors');
 
 /**
  * Broadcasts a Message to all Players.
@@ -87,12 +88,46 @@ Utility.getPlayer = (idOrName, opt_allowDuplicates, opt_caseSensitive) => {
 
 // ---------- CUSTOM RP FUNCTIONS ------------ //
 
+Utility.GotMoney = (player, needmoney, callback) => {
+	
+	let money = GetPlayerMoney(player);
+
+	let result = money - needmoney;
+
+	if(result < 0) {
+		callback(Math.abs(result));
+		return false;
+	} else {
+		callback(0);
+		return true;
+	}
+}
+
+Utility.sleep = (time, callback) => {
+	var stop = new Date().getTime();
+    while(new Date().getTime() < stop + time) {
+        ;
+    }
+    callback();
+}
+
+Utility.getAllArgs = (nstart, args) => {
+	
+	let fullText;
+
+	for(let i = nstart; i < args.length; i++) {
+		fullText += args[i];
+	}
+
+	return fullText;
+}
+
 Utility.RandomInt = (min, max) => {
-	return Math.floor(Math.random() * (max - min)) + min;
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 Utility.GetDistanceBetweenPoints = (x1, y1, z1, x2, y2, z2) => {
-	return parseFloat(parseFloat(Math.sqrt(Math.pow(Math.abs(x1 - x2),2)),Math.sqrt(Math.pow(Math.abs(y1 - y2),2))),Math.sqrt(Math.pow(Math.abs(z1 - z2),2)))
+	return parseFloat(parseFloat(Math.sqrt(Math.pow(Math.abs(x1 - x2),2)), Math.sqrt(Math.pow(Math.abs(y1 - y2), 2))), Math.sqrt(Math.pow(Math.abs(z1 - z2),2)))
 };
 
 Utility.GetPlayerDistanceToPoint = (player, x, y, z) => {
@@ -120,15 +155,18 @@ Utility.PlayerToPoint = (range, player, x, y, z) => {
 
 Utility.GetPlayerMoney = (player) => {
 	return player.stats.GetStatInt("SP0_TOTAL_CASH");
+	// Or player.stats.money must work ^^
 };
 
 Utility.SetPlayerMoney = (player, money) => {
 	return player.stats.SetStatInt("SP0_TOTAL_CASH", money);
+	// Or player.stats.money must work ^^
 };
 
 Utility.GivePlayerMoney = (player, money) => {
 	let fmoney = GetPlayerMoney(player) + (money);
 	player.stats.SetStatInt(player, fmoney);
+	// Or player.stats.money must work ^^
 };
 
 Utility.dbConnect = () => {
@@ -352,7 +390,8 @@ Utility.sphere.prototype.inRangeOfPoint = function(position) { // By Tirus
 
 // ------------  Vehicle spawn -----------//
 
-Utility.VehicleSpawn = function(model, x, y, z, rotation) { // Unused param rotation
+Utility.VehicleSpawn = function(model, x, y, z, rotation) {
+	let exrotation = rotation || 0;
 	console.log(model);
 	let fmodel;
 	if(typeof model === "string") {
@@ -363,7 +402,7 @@ Utility.VehicleSpawn = function(model, x, y, z, rotation) { // Unused param rota
 
 	//console.log(fmodel)
 	const vehicle = new Vehicle(new Vector3f(x, y, z), fmodel.h);
-  	vehicle.rotation.z = rotation;
+  	vehicle.rotation.z = exrotation;
 
   	gm.events.OnVehicleSpawn(vehicle);
   	return vehicle;

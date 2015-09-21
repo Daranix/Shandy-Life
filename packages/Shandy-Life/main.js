@@ -56,6 +56,9 @@ global.GroupInfo = [];
 // Farm system variables
 global.g_farmpoints = 0;
 global.FarmPoint = [];
+// House system variables
+global.g_houses = 0;
+global.HouseInfo = [];
 
 
 // Timers of call system
@@ -79,7 +82,7 @@ global.gm = {
   mysql:    require('./node_modules/mysql'),
   md5:      require('./node_modules/md5'),
   items:    require('./inventory.js'),
-  rpsys:   require('./roleplay_systems/systems')
+  rpsys:    require('./roleplay_systems/systems')
   //fs:       require('./node_modules/writable-file-stream') // ONLY WRITE
 };
 
@@ -99,9 +102,9 @@ function main() {
 
   // ---- This is for check database connection and spawn vehicles ----- //
 
-  let testdb = gm.utility.dbConnect();
+  let connection = gm.utility.dbConnect();
 
-  testdb.connect(function(err) {
+  connection.connect(function(err) {
     if(err) {
       console.log("Error connecting to the database ... ");
       throw err;
@@ -110,10 +113,11 @@ function main() {
     }
   });
 
-  gm.utility.LoadVehicles(testdb); // Spawn the vehicles
-  gm.rpsys.LoadGroups(testdb); // Load groups
+  gm.utility.LoadVehicles(connection); // Spawn the vehicles
+  gm.rpsys.LoadGroups(connection); // Load groups
+  gm.rpsys.LoadHouses(connection);
 
-  testdb.end();
+  connection.end();
 
   // ----------------------------------------------------------------- //
 

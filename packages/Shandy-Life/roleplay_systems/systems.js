@@ -21,35 +21,26 @@ systems.farm = require('./farm');
 systems.Shop = require('./shop');
 systems.Item = require('./item');
 systems.Group = require('./group');
-
-/*module.exports = class systems {
-
-	let farm = require('./farm');
-	let Shop = require('./shop');
-	let Item = require('./item');
-
-
-
-}*/
+systems.house = require('./house');
 
 // ---------------- Load SHOPS -------------- //
 
 systems.LoadShops = () => {
 
+	let shopSpawns = [
+		{ position: new Vector3f(3360.19, -4849.67, 111.8), items: ["apple", "orange", "kebab", "cocacola", "bannana", "rat", "lemon juice"] },
+		{ position: new Vector3f(-90.0, -2365.8, 14.3), items: ["shears", "wives", "explosive charge", "flanges keys"] }
+	];
+
 	console.log("Loading shops...");
-	let shop, position, items;
 
-	// 1 -
-	items = ["apple", "orange", "kebab", "cocacola", "bannana", "rat", "lemon juice"];
-	position = new Vector3f(3360.19, -4849.67, 111.8);
-	shop = new gm.rpsys.Shop(position, items)
-	shop.create();
-
-	// 2 -
-	items = ["shears", "wives", "explosive charge", "flanges keys"];
-	position = new Vector3f(-90.0, -2365.8, 14.3);
-	shop = new gm.rpsys.Shop(position, items)
-	shop.create();
+	let shop;
+	for(let i = 0; i < shopSpawns.length; i++) 
+	{
+		let shopData = shopSpawns[i];
+		shop = new gm.rpsys.Shop(shopData.position, shopData.items);
+		shop.create();
+	}
 
 	console.log("Loaded " + g_shops + " shop(s)");
 }
@@ -81,7 +72,7 @@ systems.LoadGroups = (dbconnection) => {
 
 		while(num_rows > cr)
 		{
-		   console.log("ROW: " + cr + " index: " + cr+1 + " ID: " + result[cr].id + "NAME: " + result[cr].name);
+		   //console.log("ROW: " + cr + " index: " + cr+1 + " ID: " + result[cr].id + "NAME: " + result[cr].name);
 
 		   parseMembers = result[cr].members.split(",");
 		   parseMembersRank = result[cr].membersrank.split(",");
@@ -104,14 +95,50 @@ systems.LoadGroups = (dbconnection) => {
 
 systems.LoadFarms = () => {
 
-  let items, position, farm;
-  console.log("Loading farm points ... ");
+	let FarmSpawn = [
+		{ position: new Vector3f(3360.19, -4849.67, 111.8), items: ["coal", "diamond"], quantity: [2, 1], probability: [95, 5] }, // Coal farm with probability of pick a diamond n.n
+	];
 
-	// Diamonds farm
-	items = ["diamond"];
-	position = new Vector3f(3360.19, -4849.67, 111.8);
-	farm = new gm.rpsys.farm(position, items, 1)
-	farm.create();
+	console.log("Loading farm points ... ");
+	
+	let farm, farmData;
+	for(let i = 0; i < FarmSpawn.length; i++)
+	{
+		farmData = FarmSpawn[i];
+		farm = new gm.rpsys.farm(farmData.position, farmData.items, farmData.quantity, farmData.probability);
+		farm.create();
+	}
 
-  console.log("Loaded " + g_farmpoints + " farm point(s)");
+	console.log("Loaded " + g_farmpoints + " farm point(s)");
+}
+
+// ----------- Load Houses --------------- //
+
+systems.LoadHouses = (dbconnection) => {
+
+	console.log("Loading houses...")
+
+	let connection = dbconnection;
+	let house, data, position;
+	
+	let SQLQuery = "SELECT * FROM houses";
+
+	connection.query(SQLQuery, function(err, result) {
+		if(err) {
+			gm.utility.print("[HOUSE ERROR] Error loading a house");
+			gm.utility.print("[HOUSE ERROR] QUERY: " + SQLQuery);
+			gm.utility.print("[HOUSE ERROR] ERR: " + err);
+		} else {
+			let num_rows = result.length;
+			let rowIndex = 0;
+			while(num_rows > rowIndex) {
+				data = result[rowIndex];
+				position = new Vector3f(data.x, data.y, data.z);
+				house = new gm.rpsys.house(data.id, position, data.interior, data.price, data.owner)
+				house.create();
+				rowIndex++;
+			}
+			console.log("Loaded " + g_houses + " house(s)");
+		}
+	});
 }
