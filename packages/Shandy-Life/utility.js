@@ -9,7 +9,7 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
                                                     _|_| 
  ********************************************************************
  * @overview GTA:Multiplayer | Shandy Life | Roleplay: Utility file *
- * @author "Daranix" & Jan "Waffle" C.							    *
+ * @author "Daranix"											    *
  ********************************************************************
  */
 "use strict";
@@ -25,7 +25,7 @@ Utility.interiors = require('./interiors');
  * @param {RGB=} [opt_color] color of the message
  */
 Utility.broadcastMessage = (message, opt_color) => {
-  for (let player of g_players) {
+  for (let player of gtamp.players) {
     player.SendChatMessage(message, opt_color);
   }
 };
@@ -41,50 +41,51 @@ Utility.broadcastMessage = (message, opt_color) => {
  *                  only contains the first one found if allowDuplicates was false, empty array if no player was found
  */
  
-Utility.getPlayer = (idOrName, opt_allowDuplicates, opt_caseSensitive) => {
-  let allowDuplicates = opt_allowDuplicates || false;
-  let caseSensitive = opt_caseSensitive || false;
-	let id = parseInt(idOrName);
-	let fnCheck;
+Utility.getPlayer = function(idOrName, opt_allowDuplicates, opt_caseSensitive) {
+    let allowDuplicates = opt_allowDuplicates || false;
+    let caseSensitive = opt_caseSensitive || false;
+    let id = parseInt(idOrName);
+    let fnCheck;
 
-	if (isNaN(id)) {
-		if(caseSensitive === false) {
-			idOrName = idOrName.toLowerCase();
-		}
+    if (isNaN(id)) {
+      if(caseSensitive === false) {
+        idOrName = idOrName.toLowerCase();
+      }
 
-		// define fnCheck to check the players name
-		fnCheck = target => {
-			let targetName;
-			if(caseSensitive === false) {
-				//ignore capital letters
-				targetName = target.name.toLowerCase();
-			}
-      else {
-				// do not ignore capital letters
-				targetName = target.name;
-			}
-			if (targetName.indexOf(idOrName) === 0) {
-				return true;
-			}
-			return false;
-		};
-	}
-  else {
-		fnCheck = target => target.client.networkId === id;
-	}
+      // define fnCheck to check the players name
+      fnCheck = target => {
+        let targetName;
+        if(caseSensitive === false) {
+          //ignore capital letters
+          targetName = target.name.toLowerCase();
+        }
+        else {
+          // do not ignore capital letters
+          targetName = target.name;
+        }
+        if (targetName.indexOf(idOrName) === 0) {
+          return true;
+        }
+        return false;
+      };
+    }
+    else {
+      fnCheck = target => target.client.networkId === id;
+    }
 
-	let playerArray = [];
-	for (let tempPlayer of g_players) {
-		if (fnCheck(tempPlayer)) {
-			playerArray.push(tempPlayer);
-			if(allowDuplicates === false) {
-				// exit the loop, because we just return the first player found
-				break;
-			}
-		}
-	}
-	return playerArray;
-};
+    let playerArray = [];
+    for (let i = 0; i < gtamp.players.length; i++) {
+      const tempPlayer = gtamp.players[i];
+      if (fnCheck(tempPlayer)) {
+        playerArray.push(tempPlayer);
+        if(allowDuplicates === false) {
+          // exit the loop, because we just return the first player found
+          break;
+        }
+      }
+    }
+    return playerArray;
+  };
 
 // ---------- CUSTOM RP FUNCTIONS ------------ //
 
@@ -111,12 +112,12 @@ Utility.sleep = (time, callback) => {
     callback();
 }
 
-Utility.getAllArgs = (nstart, args) => {
+Utility.getAllArgs = function(args) {
 	
-	let fullText;
+	let fullText = "";
 
-	for(let i = nstart; i < args.length; i++) {
-		fullText += args[i];
+	for(let i = 1; i < args.length; i++) {
+		fullText += args[i] + " ";
 	}
 
 	return fullText;
@@ -170,6 +171,7 @@ Utility.GivePlayerMoney = (player, money) => {
 };
 
 Utility.dbConnect = () => {
+  gm.utility.print("Server wants to connect");
 	return gm.mysql.createConnection({
         host     : gm.config.mysql.host,
         user     : gm.config.mysql.user,
@@ -224,7 +226,7 @@ Utility.unban = (player) => {
  */
 
 Utility.groupMessage = (gid, message, opt_color) => {
-  for (let player of g_players) {
+  for (let player of gtamp.players) {
   	if(PlayerInfo[player.name].groupid == gid) {
     	player.SendChatMessage(message, opt_color);
 	}
@@ -232,7 +234,7 @@ Utility.groupMessage = (gid, message, opt_color) => {
 };
 
 Utility.factionMessage = (faction, message, opt_color) => {
-  for (let player of g_players) {
+  for (let player of gtamp.players) {
   	if(PlayerInfo[player.name].faction == faction) {
     	player.SendChatMessage(message, opt_color);
 	}
@@ -240,7 +242,7 @@ Utility.factionMessage = (faction, message, opt_color) => {
 };
 
 Utility.adminMessage = (message, opt_color) => {
-  for (let player of g_players) {
+  for (let player of gtamp.players) {
   	if(PlayerInfo[player.name].adminlvl >= 1) {
     	player.SendChatMessage(message, opt_color);
 	}
@@ -248,7 +250,7 @@ Utility.adminMessage = (message, opt_color) => {
 };
 
 Utility.proximityMessage = (radi, sender, message, opt_color) => {
-	for(let receptor of g_players) {
+	for(let receptor of gtamp.players) {
 		if(Utility.PlayerToPoint(radi, receptor, sender.position.x, sender.position.y, sender.position.z)) {
 			receptor.SendChatMessage(message, opt_color);
 		}
@@ -323,7 +325,7 @@ Utility.CallNumber = (caller, number) => {
 
 	let result = false;
 	
-	for (let called of g_players) 
+	for (let called of gtamp.players) 
 	{
 		if(PlayerInfo[called.name].phone == number) 
 		{
@@ -358,7 +360,7 @@ Utility.phoneRing = (called, caller) => {
 
 Utility.phoneTalkTo = (caller, message, opt_color) => {
 	
-	for(let called of g_players) 
+	for(let called of gtamp.players) 
 	{
 		if(PlayerInfo[called.name].phone == pInCallNumber[caller.name] && pInCall[called.name] == true && pInCallNumber[called.name] == PlayerInfo[caller.name].phone) 
 		{
@@ -390,9 +392,13 @@ Utility.sphere.prototype.inRangeOfPoint = function(position) { // By Tirus
 
 // ------------  Vehicle spawn -----------//
 
-Utility.VehicleSpawn = function(model, x, y, z, rotation) {
+Utility.VehicleSpawn = function(model, x, y, z, rotation, col1, col2) {
+
 	let exrotation = rotation || 0;
-	console.log(model);
+  let excolor1 = col1 || new RGBA(gm.utility.RandomInt(0, 255), gm.utility.RandomInt(0,255), gm.utility.RandomInt(0,255), 255);
+  let excolor2 = col2 || new RGBA(gm.utility.RandomInt(0, 255), gm.utility.RandomInt(0,255), gm.utility.RandomInt(0,255), 255);
+
+	//console.log(model);
 	let fmodel;
 	if(typeof model === "string") {
 		fmodel = Utility.hashes.findByName(gm.utility.hashes.vehicles, model);
@@ -401,8 +407,11 @@ Utility.VehicleSpawn = function(model, x, y, z, rotation) {
 	}
 
 	//console.log(fmodel)
-	const vehicle = new Vehicle(new Vector3f(x, y, z), fmodel.h);
+	  const vehicle = new Vehicle(model.h, new Vector3f(x, y, z));
   	vehicle.rotation.z = exrotation;
+
+    vehicle.primaryRGBAColor   = excolor1;
+    vehicle.secondaryRGBAColor = excolor2;
 
   	gm.events.OnVehicleSpawn(vehicle);
   	return vehicle;

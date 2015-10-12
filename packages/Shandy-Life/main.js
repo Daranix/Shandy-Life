@@ -8,8 +8,15 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
                                                     _|_|
  *****************************************************************
  * @overview GTA:Multiplayer Shandy Life - Roleplay: Main File   *
- * @authors "Daranix" & Jan "Waffle" C.                          *
+ * @authors "Daranix"                                            *
  *****************************************************************
+
+  This package was based on the default server package: https://master.gta-mp.net/LICENSE
+  
+  * The contents of this package can be modified but you should mention the original author (Daranix)
+  
+
+
  */
 
 "use strict";
@@ -59,6 +66,7 @@ global.FarmPoint = [];
 // House system variables
 global.g_houses = 0;
 global.HouseInfo = [];
+global.g_housesv2 = [];
 
 
 // Timers of call system
@@ -76,6 +84,8 @@ global.LicenseName = ["Drive license", // car 0
                       "Plane pilot license"]; // pilot_plane 4
 
 global.gm = {
+  commandManager: new (require('./commandManager'))(),
+  commands: require('./commands/commands.js'),
   config:   require('./config.js'),
   events:   require('./events.js'),
   utility:  require('./utility.js'),
@@ -94,6 +104,8 @@ function main() {
 
   gm.utility.print("Registering Events...");
   gm.events.register();
+  gm.utility.print("Registering commands...");
+  gm.commands(gm.commandManager.add.bind(gm.commandManager));
 
   // Load shop system
   //gm.utility.LoadShops();
@@ -124,7 +136,7 @@ function main() {
   let updateInterval = gm.utility.minutes(1);
   gm.utility.print("Player update interval: " + updateInterval + " miliseconds");
 
-  setInterval(function() { gm.events.updateAllPlayers(); }, updateInterval);
+  //setInterval(function() { gm.events.updateAllPlayers(); }, updateInterval);
 
   console.log("+==============================================================+");
   console.log("  _______ __                   __        ___    __  ___");

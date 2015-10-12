@@ -69,23 +69,6 @@ class farm {
 		} else if(farmIndex == -1) return player.SendChatMessage("No was nothing here to farm");
 	} // End of pick
 
-	static farmChance(chances) {
-		let chc  = gm.utility.RandomInt(1, 100);
-		console.log("Chance: " + chc);
-		let curr = chances[0];
-		let diff = Math.abs(chc - curr);
-		let index = 0;
-		for (let i = 0; i < chances.length; i++) {
-		    let newdiff = Math.abs(chc - chances[i]);
-		    if (newdiff < diff) {
-		        diff = newdiff;
-		        curr = chances[i];
-		        index = i;
-		    }
-		}
-		return index;
-	} // End of farm chance
-
 	static chance(chances)
 	{
 	    let ar = [];

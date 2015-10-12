@@ -11,7 +11,7 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
                                                     _|_| 
  *****************************************************************
  * @overview GTA:Multiplayer Shandy Life - Roleplay: Events      *
- * @author "Daranix" & Jan "Waffle" C.                           *
+ * @author "Daranix"                                             *
  *****************************************************************
 */
 
@@ -22,8 +22,6 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
  */
 
 let Events    = module.exports;
-let commands  = require('./commands');
-//let mysql     = require('./node_modules/mysql');
 
 /**
  * Registers all Events.
@@ -105,23 +103,23 @@ Events.onChatMessage = (player, message) => {
  * @param {string} command the command
  */
 Events.onChatCommand = (player, command) => {
-  let args = command.split(" ");
-
-  // Let's check if this crazy thing ever happens.
-  if (args.length === 0) {
-    throw "This should NEVER happen.";
-  }
-  let commandName = args.splice(0, 1)[0];
-
-  for (const command of commands) {
-    if (command[0].toLowerCase() === commandName.toLowerCase()) {
-      //console.log("[CMD] " + player.name + ": /" + commandName);
-      command[1](player, args);
-      
-      return true;
+    let args = command.match(/('(\\'|[^'])*'|"(\\"|[^"])*"|\/(\\\/|[^\/])*\/|(\\ |[^ ])+|[\w-]+)/g) || [];
+    for(var i=1;i<args.length;i++)
+    {
+      if( args[i].substr(0, 1) === '"' || args[i].substr(0,1) === "'" ) {
+        args[i] = JSON.parse(args[i]);
+      }
     }
-  }
-  player.SendChatMessage("Unknown command.", new RGB(255, 59, 59));
+
+    // Let's check if this crazy thing ever happens.
+    if (args.length === 0) {
+      throw "This should NEVER happen.";
+    }
+    let commandName = args.splice(0, 1)[0];
+
+    if (!gm.commandManager.handle(player, commandName, args)) {
+      player.SendChatMessage("Unknown command.", new RGB(255, 59, 59));
+    }
 };
 
 /**
@@ -214,7 +212,7 @@ Events.onPlayerCreated = player => {
         }
     });
     connection.end();
-    console.log("Players connected: " + g_players.length);
+    console.log("Players connected: " + gtamp.players.length);
   // --
 };
 
@@ -239,7 +237,7 @@ Events.onPlayerDeath = (player, reason, killer) => {
   } else {
     message += "died.";
   }
-  for (let tempPlayer of g_players) {
+  for (let tempPlayer of gtamp.players) {
     tempPlayer.graphics.ui.DisplayMessage(message);
   }
 };
@@ -308,13 +306,13 @@ Events.onPlayerUpdate = (player, callback, info) => {
 
 Events.updateAllPlayers = () => {
   let loggedPlayers = 0;
-  if(g_players.length >= 1) 
+  if(gtamp.players.length >= 1) 
   {
     let connection = gm.utility.dbConnect();
     connection.connect();
 
     console.log("Uploading all players info...");
-    for (let player of g_players) 
+    for (let player of gtamp.players) 
     {
       if(pLogged[player.name]) 
       {

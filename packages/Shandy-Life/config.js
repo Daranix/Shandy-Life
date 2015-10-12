@@ -9,7 +9,7 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
                                                     _|_| 
  ********************************************************************
  * @overview GTA:Multiplayer | Shandy Life - Roleplay: config  file *
- * @author "Daranix" & Jan "Waffle" C.                              *
+ * @author "Daranix"                                                *
  ********************************************************************
 */
 
@@ -30,7 +30,7 @@ module.exports = {
     rainLevel: 0.0,
     snowLevel: 0.0,
     timeScale: 1.0,
-    IPLs: ['shr_int', 'FIBlobby', 'bh1_47_joshhse_firevfx', 'jewel2fake', 'RC12B_HospitalInterior'],
+    IPLs: ['shr_int', 'FIBlobby', 'bh1_47_joshhse_firevfx', 'jewel2fake', 'RC12B_HospitalInterior', 'canyonriver01', 'railing_start', 'LInvader'],
     interiors: [],
     capInteriors: true
   },
