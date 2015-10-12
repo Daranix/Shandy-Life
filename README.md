@@ -6,6 +6,8 @@ If you have any questions try looking the [wiki](https://github.com/Daranix/Shan
 
 # Changelog
 
+### [0.7.1](github.com/Daranix/Shandy-Life/commit/b9bb3e6daf139e077c78e12b6edb1428a7f25645)
+
 ### [0.7](https://github.com/Daranix/Shandy-Life/commit/34c3a6fe01e249f675c55af6d66b4b476deb60e6)
 
 - Added house system 0.1
