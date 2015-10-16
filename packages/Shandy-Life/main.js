@@ -41,7 +41,7 @@ _|_|_|    _|    _|    _|_|_|  _|    _|    _|_|_|    _|_|_|      _|_|_|_|  _|    
  */
 
 //Basic player global variables
-global.PlayerInfo = [];
+/*global.PlayerInfo = [];
 global.PlayerInventory = [];
 
 //Other player variables
@@ -51,22 +51,28 @@ global.pInCallNumber  = [];
 global.ConfirmReg = [];
 global.ConfirmPwd = [];
 global.Registered = [];
-global.GroupInvite = [];
+global.GroupInvite = [];*/
 // ----
 
 // Shopping system variables
 global.g_shops = 0;
 global.ShopInfo = [];
+
 // Group system variables
 global.g_groups = 0;
 global.GroupInfo = [];
+
 // Farm system variables
 global.g_farmpoints = 0;
 global.FarmPoint = [];
+
 // House system variables
 global.g_houses = 0;
 global.HouseInfo = [];
 global.g_housesv2 = [];
+
+// Vehicle system variable
+global.VehInfo = [];
 
 
 // Timers of call system

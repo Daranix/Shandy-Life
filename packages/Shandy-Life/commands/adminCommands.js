@@ -3,11 +3,11 @@
 module.exports = function(register) {
 
 let ERR_NO_ACCESS = "You don't have access to that command!";
-let red = new RGB(255,0,0)
+let red = new RGB(255,0,0);
 
   register("broadcast", function(player) {
 
-    if(PlayerInfo[player.name].adminlvl < 1) {
+    if(player.info.adminlvl < 1) {
       return player.SendChatMessage(ERR_NO_ACCESS);
     }
 
@@ -17,7 +17,7 @@ let red = new RGB(255,0,0)
 
   register("goto", function(player) {
 
-    if(PlayerInfo[player.name].adminlvl < 1) {
+    if(player.info.adminlvl < 1) {
       return player.SendChatMessage(ERR_NO_ACCESS);
     }
 
@@ -46,11 +46,11 @@ let red = new RGB(255,0,0)
 
   register('giveMoney', function(player) {
 
-    if(PlayerInfo[player.name].adminlvl <= 3) {
+    if(player.info.adminlvl <= 3) {
       return player.SendChatMessage(ERR_NO_ACCESS);
     }
 
-    if (arguments.length < 1) {
+    if (arguments.length < 2) {
       return player.SendChatMessage("USAGE: /giveMoney [id or name] ([money])");
     }
 
@@ -81,14 +81,16 @@ let red = new RGB(255,0,0)
 
   });
 
+//
+
 register("kick", function(player) {
 
 
-  if(PlayerInfo[player.name].adminlvl < 1) {
+  if(player.info.adminlvl < 1) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
 
-  if (arguments.length === 0) {
+  if (arguments.length < 2) {
     return player.SendChatMessage("USAGE: /kick [id or name] [Reason]", red);
   }
 
@@ -114,11 +116,11 @@ register("kick", function(player) {
 
 register("ban", function(player) {
 
-  if (arguments.length === 0) {
+  if (arguments.length < 3) {
     return player.SendChatMessage("USAGE: /ban [id or name] [Reason]", red);
   }
 
-  if(PlayerInfo[player.name].adminlvl < 1) {
+  if(player.info.adminlvl < 1) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
 
@@ -136,7 +138,7 @@ register("ban", function(player) {
     return player.SendChatMessage(msg, red);
   }
 
-  if(!pLogged[targets[0].name]) {
+  if(!targets[0].logged) {
     return player.SendChatMessage("Este usuario no esta logeado");
   }
 
@@ -149,11 +151,11 @@ register("ban", function(player) {
 
 register("promoteadmin", function(player) {
 
-  if(PlayerInfo[player.name].adminlvl < 3) {
+  if(player.info.adminlvl < 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
 
-  if (arguments.length === 0) {
+  if (arguments.length < 3) {
     return player.SendChatMessage("USAGE: /promoteadmin [id or name] [adminlvl]", red);
   }
 
@@ -177,12 +179,12 @@ register("promoteadmin", function(player) {
     return player.SendChatMessage(msg, red);
   }
 
-  if(!pLogged[targets[0].name]) {
+  if(!targets[0].logged) {
     return player.SendChatMessage("This user was not logged");
   }
 
 
-  PlayerInfo[targets[0].name].adminlvl = adminlvl;
+  targets[0].info.adminlvl = adminlvl;
 
   gm.events.onPlayerUpdate(targets[0], function(result) {
     if(result) {
@@ -197,11 +199,11 @@ register("promoteadmin", function(player) {
 
 register("promotefaction", function(player) {
 
-  if(PlayerInfo[player.name].adminlvl < 3) {
+  if(player.info.adminlvl < 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
 
-  if (arguments.length === 0) {
+  if (arguments.length < 3) {
     return player.SendChatMessage("USAGE: /promotefaction [id or name] [factionid]", red);
   }
 
@@ -225,12 +227,12 @@ register("promotefaction", function(player) {
     return player.SendChatMessage(msg, red);
   }
 
-  if(!pLogged[targets[0].name]) {
+  if(!targets[0].logged) {
     return player.SendChatMessage("This user was not logged");
   }
 
 
-  PlayerInfo[targets[0].name].faction = factionid;
+  targets[0].info.faction = factionid;
 
   gm.events.onPlayerUpdate(targets[0], function(result) {
     if(result) {
@@ -252,22 +254,25 @@ register(["a", "admin"], function(player) {
 
 register("giveLicense", function(player) {
 
-  if(PlayerInfo[player.name].adminlvl < 3) {
+  if(player.info.adminlvl < 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
-
-  let giveLicens = arguments[2];
 
   let valLicenses = [];
   let nameLicenses = "";
 
-  valLicenses = Object.keys(PlayerInfo[player.name].licenses);
+  valLicenses = Object.keys(player.info.licenses);
 
   for(let i in valLicenses) {
     //console.log(valLicenses[i]);
     nameLicenses += valLicenses[i] + ", ";
   }
 
+  if(arguments.length < 3) {
+    return player.SendChatMessage("/giveLicense [ID or name] [license: (" + nameLicenses + ")]");
+  }
+
+  let giveLicens = arguments[2];
 
   if(giveLicens == null || giveLicens == "" || !gm.utility.isInArray(giveLicens, valLicenses)) {
     player.SendChatMessage("Parameters: " + arguments[1] + " " + arguments[2]);
@@ -288,13 +293,13 @@ register("giveLicense", function(player) {
     return player.SendChatMessage(msg, red);
   }
 
-  if(!pLogged[targets[0].name]) {
+  if(!targets[0].logged) {
     return player.SendChatMessage("This user was not logged in");
   }
 
   // ---
 
-  PlayerInfo[targets[0].name].licenses[giveLicens] = true;
+  targets[0].info.licenses[giveLicens] = true;
 
   gm.events.onPlayerUpdate(targets[0], function(result) {
     if(result) {
@@ -309,7 +314,7 @@ register("giveLicense", function(player) {
 
 register("removeLicense", function(player) {
 
-  if(PlayerInfo[player.name].adminlvl < 3) {
+  if(player.info.adminlvl < 3) {
     return player.SendChatMessage(ERR_NO_ACCESS);
   }
 
@@ -318,7 +323,7 @@ register("removeLicense", function(player) {
   let valLicenses = [];
   let nameLicenses = "";
 
-  valLicenses = Object.keys(PlayerInfo[player.name].licenses);
+  valLicenses = Object.keys(player.info.licenses);
 
   for(let i in valLicenses) {
     nameLicenses += valLicenses[i] + ", ";
@@ -344,13 +349,13 @@ register("removeLicense", function(player) {
     return player.SendChatMessage(msg, red);
   }
 
-  if(!pLogged[targets[0].name]) {
+  if(!targets[0].logged) {
     return player.SendChatMessage("This user was not logged in");
   }
 
   // ---
 
-  PlayerInfo[targets[0].name].licenses[giveLicens] = false;
+  targets[0].info.licenses[giveLicens] = false;
   gm.events.onPlayerUpdate(targets[0], function(result) {
     if(result) {
       player.SendChatMessage("[ADMIN] You remove " + giveLicens + " to : " + targets[0].name);

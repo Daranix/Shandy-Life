@@ -31,7 +31,9 @@ All of this commands are for debuging purposes.
 module.exports = function(register) {
 
 	register("hash", function(player) {
-	  let text = args.join(" ");
+	  //let text = args.join(" ");
+	  //let text = gm.utility.getAllArgs(arguments);
+	  let text = gm.utility.getAllArgs(arguments);
 	  let hashtext = gm.md5(text);
 	  player.SendChatMessage(hashtext);
 	});
@@ -43,16 +45,17 @@ module.exports = function(register) {
 
 	register("jsontest", function(player) {
 
-	  let jsonString = JSON.stringify(PlayerInfo[player.name].licenses);
-	  console.log(jsonString);
+	  let jsonString = JSON.stringify(player.info.licenses);
+	  //console.log(jsonString);
+	  player.SendChatMessage(jsonString);
 
 	});
 
 	register("givePhone", function(player) {
 	  let phonenumber = gm.utility.generatePhoneNumber();
 	  //let phonenumber = 999999999;
-	  PlayerInfo[player.name].phone = phonenumber;
-	  player.SendChatMessage(PlayerInfo[player.name].phone.toString());
+	  player.info.phone = phonenumber;
+	  player.SendChatMessage(player.info.phone.toString());
 	});
 
 	register("mypos2", function(player) {
@@ -65,6 +68,9 @@ module.exports = function(register) {
 	  player.SendChatMessage("Position: " + player.position.x);
 	});
 
+	register("getmypos", function(player) {
+		player.SendChatMessage("Your pos is X: " + player.position.x + " Y: " + player.position.y + " Z: " + player.position.z);
+	});
 
 	register("checkpos", function(player) {
 
@@ -106,15 +112,17 @@ module.exports = function(register) {
 	  player.SendChatMessage("Your name is: " + player.name);
 	});
 
-	register("additem", function(player) {
+	register("additem", function(player, item, string_quantity) {
 
-	  let item = args[0];
-	  let quantity = parseInt(parseInt(args[1]));
+	  if(arguments.length < 3) return player.SendChatMessage("Use: /additem [item] [quantity]");
+
+	  //let item = args[0];
+	  let quantity = parseInt(string_quantity);
 
 	  if(isNaN(quantity)) return player.SendChatMessage("Quantity must be a number");
 
-	  /*PlayerInventory[player.name].objects.push(item);
-	  PlayerInventory[player.name].objectsQuantity.push(quantity);
+	  /*player.info.objects.push(item);
+	  player.info.objectsQuantity.push(quantity);
 	  */
 
 	  let objitem = new gm.rpsys.Item(item, quantity);
@@ -158,8 +166,8 @@ module.exports = function(register) {
 	});
 
 	register("clearInventory", function(player) {
-	  PlayerInventory[player.name].items    = [];
-	  PlayerInventory[player.name].quantity = [];
+	  player.info.items    = [];
+	  player.info.quantity = [];
 	});
 
 	register("vehiclespawn", function(player, model) {
@@ -170,4 +178,31 @@ module.exports = function(register) {
 		}*/
 		const vehicle = new Vehicle(0xB779A091, new Vector3f(player.position.x, player.position.y, player.position.z))
 	});
+
+	register("vehnear", function(player) {
+		for(let i = 0; i < gtamp.vehicles.length; i++) {
+			let veh = gtamp.vehicles[i];
+			let sphere = new gm.utility.sphere(veh.position.x, veh.position.y, veh.position.z, 10.0)
+			if(sphere.inRangeOfPoint(player.position)) {
+				let jsonString = JSON.stringify(VehInfo[veh.networkId]);
+				player.SendChatMessage("VehInfo: ");
+				player.SendChatMessage(jsonString);
+				return true;
+			}
+		}
+		player.SendChatMessage("Was not vehicle near u");
+	});
+
+	register("vehpositions", function(player) {
+		for(let i = 0; i < gtamp.vehicles.length; i++) {
+			let veh = gtamp.vehicles[i];
+			player.SendChatMessage("Veh NetID: " + veh.networkId + " X: " + veh.position.x + " Y: " + veh.position.y + " Z: " + veh.position.z);
+		}
+	});
+
+	register("varsvalues", function(player) { 
+		let jsonString = JSON.stringify(player);
+		player.SendChatMessage(jsonString);
+	});
+
 };

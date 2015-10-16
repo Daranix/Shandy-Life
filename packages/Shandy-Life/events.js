@@ -82,8 +82,9 @@ Events.onChatMessage = (player, message) => {
     //return `${player.name}: ${message}`;
     let fmsg = player.name + ': ' + message;
 
-    if(pInCall[player.name]) {
-      if(pInCallNumber[player.name] == 911) {
+    if(player.inCall) {
+      //if(pInCallNumber[player.name] == 911) {
+      if(player.inCallNumber == 911) {
         let callMessage = "(CALL) " + message;  
         gm.utility.factionMessage(1, callMessage, new RGB(0,0,255));
       } else {
@@ -134,10 +135,31 @@ Events.onPlayerCreated = player => {
   pLogged[player.name]    = false;
   pFaction[player.name]   = 0;
   pMoney[player.name]     = 0;*/
-  pLogged[player.name]    = false;
-  ConfirmReg[player.name] = false;
+  //pLogged[player.name]    = false;
+  //ConfirmReg[player.name] = false;
 
-  PlayerInfo[player.name] = {
+  player.logged      = false;
+  player.ConfirmReg  = false;
+  player.registered  = false;
+  
+
+  /*PlayerInfo[player.name] = {
+    id: 0,
+    adminlvl: 0,
+    faction: 0,
+    factionrank: 0,
+    phone: 0,
+    groupid: 0,
+    licenses: {
+      car: false,
+      boat: false,
+      truck: false,
+      pilot_helicopter: false,
+      pilot_plane: false
+    },
+  };*/
+
+  player.info = {
     id: 0,
     adminlvl: 0,
     faction: 0,
@@ -153,7 +175,14 @@ Events.onPlayerCreated = player => {
     },
   };
 
-  PlayerInventory[player.name] = {
+  /*PlayerInventory[player.name] = {
+    objects: [],
+    objectsQuantity: [],
+    weight: 0,
+    maxWeight: 64
+  };*/
+
+ player.inventory = {
     objects: [],
     objectsQuantity: [],
     weight: 0,
@@ -204,11 +233,13 @@ Events.onPlayerCreated = player => {
 
         if(numRows >= 1) {
           player.SendChatMessage("Use /login [password] to login");
-          Registered[player.name] = true;
+          //Registered[player.name] = true;
+          player.registered = true;
 
         } else {
           player.SendChatMessage("You wasn't registered, use /register [Password] to register");
-          Registered[player.name] = false;
+          //Registered[player.name] = false;
+          player.registered = false;
         }
     });
     connection.end();
@@ -260,7 +291,8 @@ Events.onPlayerShot = player => {
  */
  
 Events.onPlayerDestroyed = player => {
-  if(pLogged[player.name]) { Events.onPlayerUpdate(player); }
+  //if(pLogged[player.name]) { Events.onPlayerUpdate(player); }
+  if(player.logged) { Events.onPlayerUpdate(player); }
   console.log("Player " + player.name + " is leaving the server.");
 };
 
@@ -275,17 +307,27 @@ Events.onPlayerUpdate = (player, callback, info) => {
   info = typeof info !== 'undefined' ? info : true;
   let connection = gm.utility.dbConnect();
   
-  let jsonString = JSON.stringify(PlayerInfo[player.name].licenses);
+  //let jsonString = JSON.stringify(PlayerInfo[player.name].licenses);
+  let jsonString = JSON.stringify(player.info.licenses);
 
   connection.connect();
 
-  let SQLQuery = "UPDATE users SET" +
+  /*let SQLQuery = "UPDATE users SET" +
   " adminlvl=" + PlayerInfo[player.name].adminlvl +
   " ,faction=" + PlayerInfo[player.name].faction +
   " ,licenses='" + jsonString + "'" +
   " ,phone=" + PlayerInfo[player.name].phone +
   " ,groupid=" + PlayerInfo[player.name].groupid +
-  " WHERE id = " + PlayerInfo[player.name].id;
+  " WHERE id = " + PlayerInfo[player.name].id;*/
+
+  let SQLQuery = "UPDATE users SET" +
+  " adminlvl=" + player.info.adminlvl +
+  " ,faction=" + player.info.faction +
+  " ,licenses='" + jsonString + "'" +
+  " ,phone=" + player.info.phone +
+  " ,groupid=" + player.info.groupid +
+  " WHERE id = " + player.info.id;
+
 
   connection.query(SQLQuery, function(err) {
     if(err) {
@@ -314,20 +356,20 @@ Events.updateAllPlayers = () => {
     console.log("Uploading all players info...");
     for (let player of gtamp.players) 
     {
-      if(pLogged[player.name]) 
+      if(player.logged) 
       {
         //Events.onPlayerUpdate(player,function(){},false);
-        let jsonString = JSON.stringify(PlayerInfo[player.name].licenses);
+        let jsonString = JSON.stringify(player.info.licenses);
         let SQLQuery = "UPDATE users SET" +
-        " adminlvl=" + PlayerInfo[player.name].adminlvl +
-        " ,faction=" + PlayerInfo[player.name].faction +
+        " adminlvl=" + player.info.adminlvl +
+        " ,faction=" + player.info.faction +
         " ,licenses='" + jsonString + "'" +
-        " ,phone=" + PlayerInfo[player.name].phone +
-        " ,groupid=" + PlayerInfo[player.name].groupid +
+        " ,phone=" + player.info.phone +
+        " ,groupid=" + player.info.groupid +
         " ,posx=" + player.position.x +
         " ,posy=" + player.position.y +
         " ,posz=" + player.position.z +
-        " WHERE id = " + PlayerInfo[player.name].id;
+        " WHERE id = " + player.info.id;
 
         connection.query(SQLQuery, function(err) {
           if(err) {
@@ -360,18 +402,18 @@ Events.onPlayerLogin = (player, dbData) => {
   let parsedLicenses;
 
   if(dbData.licenses.length == 0) {
-    parsedLicenses = PlayerInfo[player.name].licenses
+    parsedLicenses = player.info.licenses
   } else {
     parsedLicenses = JSON.parse(dbData.licenses);
   }
 
   let parsedLength = Object.keys(parsedLicenses).length;
-  let licensesLength = Object.keys(PlayerInfo[player.name].licenses).length;
+  let licensesLength = Object.keys(player.info.licenses).length;
 
   if(parsedLength < licensesLength) {
     
     let howMuch = licensesLength - parsedLength;
-    let keys = Object.keys(PlayerInfo[player.name].licenses);
+    let keys = Object.keys(player.info.licenses);
 
     for(let i = howMuch; i <  licensesLength; i++) {
       parsedLicenses[keys[i]] = false;
@@ -382,7 +424,23 @@ Events.onPlayerLogin = (player, dbData) => {
 
   // Put values to the player
 
-  PlayerInfo[player.name] = {
+ /* PlayerInfo[player.name] = {
+    id: dbData.id,
+    adminlvl: dbData.adminlvl,
+    faction: dbData.faction,
+    factionrank: dbData.factionrank,
+    phone: dbData.phone,
+    groupid: dbData.groupid,
+    licenses: parsedLicenses /*{
+      car: false,
+      boat: false,
+      truck: false,
+      pilot_helicopter: false,
+      pilot_plane: false
+    },*/
+  //};
+
+  player.info = {
     id: dbData.id,
     adminlvl: dbData.adminlvl,
     faction: dbData.faction,
@@ -398,7 +456,8 @@ Events.onPlayerLogin = (player, dbData) => {
     },*/
   };
 
-  pLogged[player.name] = true;
+  //pLogged[player.name] = true;
+  player.logged = true;
 };
 
 Events.OnVehicleSpawn = (vehicle) => {

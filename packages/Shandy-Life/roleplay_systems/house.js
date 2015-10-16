@@ -31,7 +31,7 @@ class house {
 		let index = house.inHouseEntrace(player);
 
 		if(index >= 0) {
-			if(HouseInfo[index].owner == PlayerInfo[player.name].id || HouseInfo[index].locked == 0) {
+			if(HouseInfo[index].owner == player.info.id || HouseInfo[index].locked == 0) {
 				player.position = gm.utility.interiors[HouseInfo[index].interior].position;
 			} else return player.SendChatMessage("This door is locked");
 		} else if(index < 0 && !msg) return player.SendChatMessage("You aren't in a house entrance");
@@ -52,7 +52,7 @@ class house {
 		let index = house.inHouseEntrace(player);
 
 		if(index >= 0) {
-			if(HouseInfo[index].owner == PlayerInfo[player.name].id) {
+			if(HouseInfo[index].owner == player.info.id) {
 				HouseInfo[index].owner = 0;
 				let sellprice = HouseInfo[index].price / 2;
 				//gm.utility.GivePlayerMoney(player, sellprice);
@@ -72,7 +72,7 @@ class house {
 			}) return false;
 			gm.utility.GivePlayerMoney( - HouseInfo[index].price);*/
 			if(HouseInfo[index].owner == 0) {
-				HouseInfo[index].owner = PlayerInfo[player.name].id;
+				HouseInfo[index].owner = player.info.id;
 				house.Update(index);
 				player.SendChatMessage("You buy this house for " + HouseInfo[index].price + "$");
 			} else return player.SendChatMessage("This house has already a owner");

@@ -114,10 +114,10 @@ Utility.sleep = (time, callback) => {
 
 Utility.getAllArgs = function(args) {
 	
-	let fullText = "";
+	let fullText = args[1];
 
-	for(let i = 1; i < args.length; i++) {
-		fullText += args[i] + " ";
+	for(let i = 2; i < args.length; i++) {
+		fullText += " " + args[i];
 	}
 
 	return fullText;
@@ -165,7 +165,7 @@ Utility.SetPlayerMoney = (player, money) => {
 };
 
 Utility.GivePlayerMoney = (player, money) => {
-	let fmoney = GetPlayerMoney(player) + (money);
+	let fmoney = Utility.GetPlayerMoney(player) + (money);
 	player.stats.SetStatInt(player, fmoney);
 	// Or player.stats.money must work ^^
 };
@@ -191,7 +191,7 @@ Utility.ban = (player) => {
 
 	connection.connect();
 
-	let SQLQuery = "UPDATE users SET banned = 1 WHERE id = " + PlayerInfo[player.name].id;
+	let SQLQuery = "UPDATE users SET banned = 1 WHERE id = " + player.info.id;
 	gm.utility.print(player.name + "has been banned");
 	connection.query(SQLQuery);
 
@@ -210,7 +210,7 @@ Utility.unban = (player) => {
 
 	connection.connect();
 
-	let SQLQuery = "UPDATE users SET banned = 0 WHERE id = " + PlayerInfo[player.name].id;
+	let SQLQuery = "UPDATE users SET banned = 0 WHERE id = " + player.info.id;
 	gm.utility.print(player.name + "has been unbanned");
 	connection.query(SQLQuery);
 
@@ -226,26 +226,30 @@ Utility.unban = (player) => {
  */
 
 Utility.groupMessage = (gid, message, opt_color) => {
-  for (let player of gtamp.players) {
-  	if(PlayerInfo[player.name].groupid == gid) {
+  //for (let player of gtamp.players) {
+  for(let i = 0; i < gtamp.players.length; i++) {
+
+  	if(gtamp.players[i].info.groupid == gid) {
     	player.SendChatMessage(message, opt_color);
-	}
+	 }
   }
 };
 
 Utility.factionMessage = (faction, message, opt_color) => {
-  for (let player of gtamp.players) {
-  	if(PlayerInfo[player.name].faction == faction) {
-    	player.SendChatMessage(message, opt_color);
-	}
+  //for (let player of gtamp.players) {
+  for(let i = 0; i < gtamp.players.length; i++) {
+
+    if(gtamp.players[i].info.faction == faction) {
+      player.SendChatMessage(message, opt_color);
+   }
   }
 };
 
 Utility.adminMessage = (message, opt_color) => {
-  for (let player of gtamp.players) {
-  	if(PlayerInfo[player.name].adminlvl >= 1) {
+  for(let i = 0; i < gtamp.players.length; i++) {
+  	if(gtamp.players[i].info.adminlvl >= 1) {
     	player.SendChatMessage(message, opt_color);
-	}
+	 }
   }
 };
 
@@ -327,7 +331,7 @@ Utility.CallNumber = (caller, number) => {
 	
 	for (let called of gtamp.players) 
 	{
-		if(PlayerInfo[called.name].phone == number) 
+		if(called.info.phone == number) 
 		{
     		called.SendChatMessage("Your phone is ringing (hang on with: /hangon)", new RGB(255,0,0));
     		Utility.proximityMessage(100.0, caller, called.name + "'s phone is ringing");
@@ -349,10 +353,14 @@ Utility.CallNumber = (caller, number) => {
 Utility.phoneRing = (called, caller) => {
 	called.SendChatMessage("You have not answered the call");
 	caller.SendChatMessage("Your call has not been answered");
-	pInCall[caller.name] = false;
+	/*pInCall[caller.name] = false;
 	pInCallNumber[caller.name] = 0;
 	pInCall[called.name] = false,
-	pInCallNumber[called.name] = 0;
+	pInCallNumber[called.name] = 0;*/
+  caller.inCall = false;
+  caller.inCallNumber = 0;
+  called.inCall = false;
+  called.inCallNumber = 0;
 	clearInterval(TimerRing[called.name]);
 	clearTimeout(gTimerRing[called.name]);
 
@@ -362,7 +370,8 @@ Utility.phoneTalkTo = (caller, message, opt_color) => {
 	
 	for(let called of gtamp.players) 
 	{
-		if(PlayerInfo[called.name].phone == pInCallNumber[caller.name] && pInCall[called.name] == true && pInCallNumber[called.name] == PlayerInfo[caller.name].phone) 
+		//if(called.info.phone == pInCallNumber[caller.name] && pInCall[called.name] == true && pInCallNumber[called.name] == PlayerInfo[caller.name].phone)
+    if(called.info.phone == caller.inCallNumber && called.inCall == true && called.inCallNumber == caller.info.phone)
 		{
 			called.SendChatMessage(message, opt_color);
 		}
@@ -384,7 +393,7 @@ Utility.sphere = class Sphere { // By Tirus
 
 Utility.sphere.prototype.inRangeOfPoint = function(position) { // By Tirus
 
-	console.log(position.x);
+	//console.log(position.x);
 	return (Math.pow((position.x - this.x), 2) +
             Math.pow((position.y - this.y), 2) +
             Math.pow((position.z - this.z), 2) < Math.pow(this.radius, 2));
@@ -392,7 +401,7 @@ Utility.sphere.prototype.inRangeOfPoint = function(position) { // By Tirus
 
 // ------------  Vehicle spawn -----------//
 
-Utility.VehicleSpawn = function(model, x, y, z, rotation, col1, col2) {
+Utility.spawnVehicle = function(model, x, y, z, rotation, col1, col2) {
 
 	let exrotation = rotation || 0;
   let excolor1 = col1 || new RGBA(gm.utility.RandomInt(0, 255), gm.utility.RandomInt(0,255), gm.utility.RandomInt(0,255), 255);
@@ -434,12 +443,18 @@ Utility.LoadVehicles = (dbconnection) => {
     	let cr = 0;
 
     	while(num_rows > cr) {
-    		Utility.VehicleSpawn(result[cr].modelid, result[cr].posx, result[cr].posy, result[cr].posz);
+    		const v = Utility.spawnVehicle(result[cr].modelid, result[cr].posx, result[cr].posy, result[cr].posz);
+        VehInfo[v.networkId] = {
+          id: result[cr].carid,
+          owner: result[cr].ownerid,
+          locked: true
+        }
     		cr++;
     	}
 
-    	console.log("Spawned " + cr + " car(s)")
+      //console.log()
 
+    	console.log("Spawned " + cr + " car(s)")
     }
 
   });

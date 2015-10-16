@@ -5,7 +5,13 @@ module.exports = function(register) {
 register("register", function(player, password) {
   //let password = args.join(" ");
 
-  if(pLogged[player.name]) {
+  if(arguments.length < 2) {
+    return player.SendChatMessage("Use: /register [password]")
+  }
+
+  // Here check if password was a valid password I WAS HERE CHECKING :D
+
+  if(player.logged) {
     return player.SendChatMessage("You was already registered");
   }
 
@@ -23,9 +29,9 @@ register("register", function(player, password) {
     }
   });
 
-  if(ConfirmReg[player.name])
+  if(player.ConfirmReg)
   {
-    if(ConfirmPwd[player.name] == password)
+    if(player.ConfirmPwd == password)
     {
       let salt = gm.config.mysql.salt;
       password = password + salt;
@@ -48,8 +54,8 @@ register("register", function(player, password) {
             connection.query("SELECT id FROM users WHERE name = " + playername, function(err2, results)
               {
 
-                PlayerInfo[player.name].id = results[0].id;
-                /*PlayerInfo[player.name] = {
+                player.info.id = results[0].id;
+                /*player.info = {
                   id: results[0].id,
                   adminlvl: 0,
                   faction: 0,
@@ -64,7 +70,7 @@ register("register", function(player, password) {
                 };*/
 
                 gm.events.onPlayerUpdate(player, function() {});
-                pLogged[player.name]  = true;
+                player.logged  = true;
 
               });
             connection.end();
@@ -79,13 +85,13 @@ register("register", function(player, password) {
 
     } else {
       player.SendChatMessage("Password doesn't match, please try again");
-      ConfirmPwd[player.name] = "";
-      ConfirmReg[player.name] = false;
+      player.ConfirmPwd = "";
+      player.ConfirmReg = false;
     }
 
   } else {
-    ConfirmPwd[player.name] = password;
-    ConfirmReg[player.name] = true;
+    player.ConfirmPwd = password;
+    player.ConfirmReg = true;
     player.SendChatMessage("To confirm the password write again /register [password]");
   }
 
@@ -93,7 +99,8 @@ register("register", function(player, password) {
 
 register("login", function(player, password) {
 
-  if(!Registered[player.name]) {
+  //if(!Registered[player.name]) {
+  if(player.registered) {
     return player.SendChatMessage("You wasn't not registered, please first /register [password]");
   } else {
 
@@ -139,27 +146,27 @@ register("login", function(player, password) {
 
 register("call", function(player, string_number) {
 
-  if(PlayerInfo[player.name].phone == 0) {
+  if(player.info.phone == 0) {
     return player.SendChatMessage("You don't have a phone!");
   }
 
-  if(pInCall[player.name]) {
+  if(player.inCall) {
 
-    if(pInCallNumber[player.name] != 911)
+    if(player.inCallNumber != 911)
     {
         for(let called of gtamp.players)
         {
-          if(pInCall[called.name] == true && pInCallNumber[called.name] == PlayerInfo[player.name].phone)
+          if(called.inCall == true && called.inCallNumber == player.info.phone)
           {
-            pInCall[called.name] = false;
-            pInCallNumber[called.name] = 0;
+            called.inCall = false;
+            called.inCallNumber = 0;
             called.SendChatMessage("The call has been hung");
             break;
           }
         }
     }
-    pInCall[player.name] = false;
-    pInCallNumber[player.name] = 0;
+    player.inCall = false;
+    player.inCallNumber = 0;
     return player.SendChatMessage("The call has been hung");
   }
 
@@ -174,16 +181,16 @@ register("call", function(player, string_number) {
 
     player.SendChatMessage("Hi, this is the police department of Los Santos");
     player.SendChatMessage("How may I help you?");
-    pInCall[player.name] = true;
-    pInCallNumber[player.name] = 911;
+    player.inCall = true;
+    player.inCallNumber = 911;
 
   } else {
 
     // Check if is a valid telephone number and if the player with that number is connected (for)
 
     if(gm.utility.CallNumber(player, number)) {
-      pInCall[player.name] = true;
-      pInCallNumber[player.name] = number;
+      player.inCall = true;
+      player.inCallNumber = number;
 
     } else {
       player.SendChatMessage("The phone you called doesn't exist or is turned off.");
@@ -191,7 +198,7 @@ register("call", function(player, string_number) {
 
   }
 
-  if(pInCall[player.name]) {
+  if(player.inCall) {
     return player.SendChatMessage("When you want to hang out write again /call");
   }
 
@@ -202,10 +209,11 @@ register("hangon", function(player) {
 
   for(let caller of gtamp.players)
   {
-    if(pInCall[caller.name] == true && pInCallNumber[caller.name] == PlayerInfo[player.name].phone)
+    //if(pInCall[caller.name] == true && pInCallNumber[caller.name] == player.info.phone)
+    if(player.inCall == true && player.inCallNumber == player.info.phone)
     {
-      pInCall[player.name] = true;
-      pInCallNumber[player.name] = PlayerInfo[caller.name].phone;
+      player.inCall = true;
+      player.inCallNumber = PlayerInfo[caller.name].phone;
       caller.SendChatMessage("the call has been answered");
       player.SendChatMessage("You hang on the call");
       clearInterval(TimerRing[player.name]);
@@ -230,7 +238,7 @@ register("group", function(player) {
         return player.SendChatMessage("/group create [group name]");
       }
 
-      if(PlayerInfo[player.name].groupid >= 1) return player.SendChatMessage("You was already in a group");
+      if(player.info.groupid >= 1) return player.SendChatMessage("You was already in a group");
 
       let group = new gm.rpsys.Group(gname);
       group.create(player);
@@ -246,16 +254,16 @@ register("group", function(player) {
 
       if(arguments[2] == 'accept') {
 
-        if(typeof GroupInvite[player.name] === 'undefined' || GroupInvite[player.name] == '') return player.SendChatMessage("You don't have a invitations to accept");
+        if(typeof player.GroupInvite === 'undefined' || player.GroupInvite == '') return player.SendChatMessage("You don't have a invitations to accept");
 
-        //let grid = GroupInvite[player.name];
+        //let grid = player.GroupInvite;
 
-        gm.rpsys.Group.addmember(player, GroupInvite[player.name]);
+        gm.rpsys.Group.addmember(player, player.GroupInvite);
 
-        GroupInvite[player.name] = '';
+        player.GroupInvite = '';
         //player.SendChatMessage("New member to de group: " + player.name);
-        gm.rpsys.groupMessage(PlayerInfo[player.name].groupid, "New member to the group: " + player.name, new RGB(255,255,255));
-        return player.SendChatMessage("Welcome to the group: " + gm.rpsys.Group.findNameById(PlayerInfo[player.name].groupid));
+        gm.rpsys.groupMessage(player.info.groupid, "New member to the group: " + player.name, new RGB(255,255,255));
+        return player.SendChatMessage("Welcome to the group: " + gm.rpsys.Group.findNameById(player.info.groupid));
 
       }
 
@@ -263,19 +271,19 @@ register("group", function(player) {
 
       if(arguments[2] == 'refuse') {
 
-        if(typeof GroupInvite[player.name] === 'undefined' || GroupInvite[player.name] == '') return player.SendChatMessage("You don't have a invitations to delince");
+        if(typeof player.GroupInvite === 'undefined' || player.GroupInvite == '') return player.SendChatMessage("You don't have a invitations to delince");
 
-        GroupInvite[player.name] = '';
-        return player.SendChatMessage("You delinced the invitation to the group: " + GroupInfo[GroupInvite[player.name]].name)
+        player.GroupInvite = '';
+        return player.SendChatMessage("You delinced the invitation to the group: " + GroupInfo[player.GroupInvite].name)
       }
 
-      if(PlayerInfo[player.name].groupid == 0) {
+      if(player.info.groupid == 0) {
         return player.SendChatMessage("You dont have a group!");
       }
 
       // Invite player
 
-      let gid = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
+      let gid = gm.rpsys.Group.findById(player.info.groupid);
 
       let index = GroupInfo[gid].members.indexOf(player.name); //GroupInfo[gid].membersrank.indexOf(GroupInfo[gid].members);
       let memberrank = GroupInfo[gid].membersrank[index];
@@ -298,11 +306,12 @@ register("group", function(player) {
           return player.SendChatMessage(msg, red);
         }
 
-      if(PlayerInfo[targets[0].name].groupid >= 1) return player.SendChatMessage("This player was already in a group");
+      if(targets[0].info.groupid >= 1) return player.SendChatMessage("This player was already in a group");
       //let group = new gm.utility.Group(GroupInfo[gid].name);
-      //let igid = PlayerInfo[player.name].groupid; //GroupInfo[PlayerInfo[player.name].groupid].id;
+      //let igid = player.info.groupid; //GroupInfo[player.info.groupid].id;
 
-      GroupInvite[targets[0].name] = gid;
+      //GroupInvite[targets[0].name] = gid;
+      targets[0].GroupInvite = gid;
 
       targets[0].SendChatMessage("You recieved a invitation to the group " + GroupInfo[gid].name + " from " + player.name);
       targets[0].SendChatMessage("You can accept/delince the invitation using: /group invite (accept/refuse)");
@@ -312,22 +321,22 @@ register("group", function(player) {
 
     case 'leave': {
 
-      if(PlayerInfo[player.name].groupid == 0) return player.SendChatMessage("You dont have a group!");
+      if(player.info.groupid == 0) return player.SendChatMessage("You dont have a group!");
 
-      let groupName = gm.rpsys.Group.findNameById(PlayerInfo[player.name].groupid);
+      let groupName = gm.rpsys.Group.findNameById(player.info.groupid);
 
       player.SendChatMessage("You leaved from the group: " + groupName);
       // Send group message
-      let groupIndex = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
+      let groupIndex = gm.rpsys.Group.findById(player.info.groupid);
 
       gm.rpsys.Group.removemember(player);//, groupIndex);
       break;
 
     }
     case 'kick': {
-      if(PlayerInfo[player.name].groupid == 0 ) return player.SendChatMessage("You don't have a group!");
+      if(player.info.groupid == 0 ) return player.SendChatMessage("You don't have a group!");
 
-      let indexGroup = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
+      let indexGroup = gm.rpsys.Group.findById(player.info.groupid);
 
       let indexRank = GroupInfo[indexGroup].members.indexOf(player.name);
 
@@ -349,7 +358,7 @@ register("group", function(player) {
           return player.SendChatMessage(msg, red);
         }
 
-        if(PlayerInfo[player.name].groupid != PlayerInfo[targets[0].name].groupid) return player.SendChatMessage("This player wasn't in your group");
+        if(player.info.groupid != targets[0].info.groupid) return player.SendChatMessage("This player wasn't in your group");
 
         gm.rpsys.Group.removemember(targets[0]);
 
@@ -360,9 +369,9 @@ register("group", function(player) {
 
     case 'promote': {
 
-      if(PlayerInfo[player.name].groupid == 0) return player.SendChatMessage("You aren't in a group");
+      if(player.info.groupid == 0) return player.SendChatMessage("You aren't in a group");
 
-      let indexGroup = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
+      let indexGroup = gm.rpsys.Group.findById(player.info.groupid);
 
       let indexRank = GroupInfo[indexGroup].members.indexOf(player.name);
 
@@ -399,11 +408,11 @@ register("group", function(player) {
 
     case 'show': {
       // Show info group (members & ranks)
-      if(PlayerInfo[player.name].groupid == 0) {
+      if(player.info.groupid == 0) {
         return player.SendChatMessage("You aren't in a group");
       }
 
-      let gid = gm.rpsys.Group.findById(PlayerInfo[player.name].groupid);
+      let gid = gm.rpsys.Group.findById(player.info.groupid);
       if(!gid) {
         player.SendChatMessage("Groups: " + g_groups)
         return player.SendChatMessage("Error when trying to get group info");
@@ -481,9 +490,9 @@ register("shop", function(player) {
           } else {
             let sellItem = [];
 
-            for(let c = 0; c < PlayerInventory[player.name].objects; c++) {
-              if(gm.utility.isInArray(PlayerInventory[player.name].objects[c], ShopInfo[i].items)) {
-                sellItem.push(PlayerInventory[player.name].objects[c]);
+            for(let c = 0; c < player.inventory.objects; c++) {
+              if(gm.utility.isInArray(player.inventory.objects[c], ShopInfo[i].items)) {
+                sellItem.push(player.inventory.objects[c]);
               }
             }
 
@@ -505,9 +514,9 @@ register("shop", function(player) {
           if(ShopInfo[i].type == 'dealer') {
             player.SendChatMessage(" You can sell the next things here: (use /shop sell [item number or name] [quantity]");
             let count = 0;
-            for(let c = 0; c < PlayerInventory[player.name].objects; c++) {
-              if(gm.utility.isInArray(PlayerInventory[player.name].objects[c], ShopInfo[i].items)) {
-                player.SendChatMessage(count + ": " + PlayerInventory[player.name].objects[c]);
+            for(let c = 0; c < player.inventory.objects; c++) {
+              if(gm.utility.isInArray(player.inventory.objects[c], ShopInfo[i].items)) {
+                player.SendChatMessage(count + ": " + player.inventory.objects[c]);
                 count++;
               }
             }

@@ -44,81 +44,81 @@ Item.prototype.give = function(player) {
 
 	let obj = Item.findByName(gm.items, this.item);
 
-	let totalWeight = (obj.w * this.quantity) + PlayerInventory[player.name].weight;
+	let totalWeight = (obj.w * this.quantity) + player.inventory.weight;
 
-	if(PlayerInventory[player.name].maxWeight < totalWeight) {
+	if(player.inventory.maxWeight < totalWeight) {
 		return player.SendChatMessage("You don't have enought space");
 	}
 
-	if(gm.utility.isInArray(this.item, PlayerInventory[player.name].objects)) {
+	if(gm.utility.isInArray(this.item, player.inventory.objects)) {
 
-		let index = PlayerInventory[player.name].objects.indexOf(this.item);
-		PlayerInventory[player.name].objectsQuantity[index] += this.quantity;
+		let index = player.inventory.objects.indexOf(this.item);
+		player.inventory.objectsQuantity[index] += this.quantity;
 
 	} else {
 
-		PlayerInventory[player.name].objects.push(this.item);
-		PlayerInventory[player.name].objectsQuantity.push(this.quantity);
+		player.inventory.objects.push(this.item);
+		player.inventory.objectsQuantity.push(this.quantity);
 
 	}
 
-	PlayerInventory[player.name].weight += obj.w * this.quantity;
+	player.inventory.weight += obj.w * this.quantity;
 
 }
 
 Item.prototype.remove = function(player) {
 
 
-	let index = PlayerInventory[player.name].objects.indexOf(this.item);
+	let index = player.inventory.objects.indexOf(this.item);
 	//player.SendChatMessage("index: " + index);
 	if(index < 0) index = 0; //player.SendChatMessage("index changed to 0");
 
-	let result = PlayerInventory[player.name].objectsQuantity[index] - this.quantity;
+	let result = player.inventory.objectsQuantity[index] - this.quantity;
 	//player.SendChatMessage("result: " + result);
 
-	//console.log(Object.keys(PlayerInventory[player.name].objects));
+	//console.log(Object.keys(player.inventory.objects));
 
 
 	if(result <= 0) {
 
 		/* // If the lower value must be 1
-			let howMuch = this.quantity + (PlayerInventory[player.name].objectsQuantity[index] - this.quantity);
+			let howMuch = this.quantity + (player.inventory.objectsQuantity[index] - this.quantity);
 
-			PlayerInventory[player.name].objectsQuantity -= howMuch;
+			player.inventory.objectsQuantity -= howMuch;
 		*/
 		
-		PlayerInventory[player.name].objects[index] 		= "NOITEM";
-		PlayerInventory[player.name].objectsQuantity[index] = 0;
+		player.inventory.objects[index] 		= "NOITEM";
+		player.inventory.objectsQuantity[index] = 0;
 
 		// Reorder array: delete items with value 0
 
 		let reorder = [];
 		let reorderQuantity = [];
 		
-		let objectsLength = PlayerInventory[player.name].objects.length;
+		let objectsLength = player.inventory.objects.length;
 
 		for(let i = 0; i < objectsLength; i++) {
-			if(PlayerInventory[player.name].objects[i] != "NOITEM") {
-				reorder.push(PlayerInventory[player.name].objects[i]);
-				reorderQuantity.push(PlayerInventory[player.name].objectsQuantity[i]);
+			if(player.inventory.objects[i] != "NOITEM") {
+				reorder.push(player.inventory.objects[i]);
+				reorderQuantity.push(player.inventory.objectsQuantity[i]);
 			}
 		}
 
-		if(reorder.length == 0) { //&& isNaN(PlayerInventory[player.name].objectsQuantity)) {
-			PlayerInventory[player.name].objects 		 = [];
-			PlayerInventory[player.name].objectsQuantity = [];
-			PlayerInventory[player.name].weight 		 = 0;
+		if(reorder.length == 0) { //&& isNaN(player.inventory.objectsQuantity)) {
+			player.inventory.objects 		 = [];
+			player.inventory.objectsQuantity = [];
+			player.inventory.weight 		 = 0;
 		} else {
-			PlayerInventory[player.name].objects 		 = [reorder];
-			PlayerInventory[player.name].objectsQuantity = [reorderQuantity];
-			PlayerInventory[player.name].weight 		-= obj.w * this.quantity;		
+			player.inventory.objects 		 = [reorder];
+			player.inventory.objectsQuantity = [reorderQuantity];
+			player.inventory.weight 		-= obj.w * this.quantity;		
 		}
 
 
 		//player.SendChatMessage("REORDER: " + reorder[0] +  " quantity: " + reorderQuantity[0] + " length: " + reorder.length);
 
 	} else {
-		PlayerInventory[player.name].objectsQuantity[index] = result;
+		player.inventory.objectsQuantity[index] = result;
 	}
 
 }
