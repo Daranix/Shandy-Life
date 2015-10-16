@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 06-09-2015 a las 01:17:13
+-- Tiempo de generación: 16-10-2015 a las 17:34:41
 -- Versión del servidor: 5.6.25
 -- Versión de PHP: 5.6.11
 
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `cars` (
   `posx` float NOT NULL,
   `posy` float NOT NULL,
   `posz` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -46,7 +46,23 @@ CREATE TABLE IF NOT EXISTS `groups` (
   `name` text NOT NULL,
   `members` text NOT NULL,
   `membersrank` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `houses`
+--
+
+CREATE TABLE IF NOT EXISTS `houses` (
+  `id` int(11) NOT NULL,
+  `price` int(11) NOT NULL,
+  `owner` int(11) NOT NULL DEFAULT '0',
+  `interior` int(11) NOT NULL,
+  `x` float NOT NULL,
+  `y` float NOT NULL,
+  `z` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
 
@@ -68,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `posx` float NOT NULL,
   `posy` float NOT NULL,
   `posz` float NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 --
 -- Índices para tablas volcadas
@@ -84,6 +100,12 @@ ALTER TABLE `cars`
 -- Indices de la tabla `groups`
 --
 ALTER TABLE `groups`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `houses`
+--
+ALTER TABLE `houses`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -105,6 +127,11 @@ ALTER TABLE `cars`
 -- AUTO_INCREMENT de la tabla `groups`
 --
 ALTER TABLE `groups`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT de la tabla `houses`
+--
+ALTER TABLE `houses`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT de la tabla `users`
