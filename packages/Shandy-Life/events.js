@@ -197,13 +197,24 @@ Events.onPlayerCreated = player => {
   player.world.timeScale = gm.config.world.timeScale;
   player.world.weather = gm.config.world.defaultWeather;
 
-  for (let ipl of gm.config.world.IPLs) {
+  /*for (let ipl of gm.config.world.IPLs) {
     player.world.RequestIPL(ipl);
   }
   for (let interior of gm.config.world.interiors) {
     player.world.EnableInterior(interior);
     if (!gm.config.world.capInteriors) {
       player.world.UnCapInterior(interior);
+    }
+  }*/
+
+  for(let i = 0; i < gm.config.world.IPLs.length; i++) {
+    player.world.RequestIPL(gm.config.world.IPLs[i]);
+  }
+
+  for(let i = 0; i < gm.config.world.interiors.length; i++) {
+    player.world.EnableInterior(gm.config.interiors[i]);
+    if(!gm.config.world.capInteriors) {
+      player.world.UnCapInterior(gm.config.world.interiors[i]);
     }
   }
 
@@ -354,8 +365,9 @@ Events.updateAllPlayers = () => {
     connection.connect();
 
     console.log("Uploading all players info...");
-    for (let player of gtamp.players) 
+    for(let i = 0; i < gtamp.players.length; i++) 
     {
+      let player = gtamp.players[i];
       if(player.logged) 
       {
         //Events.onPlayerUpdate(player,function(){},false);
@@ -384,7 +396,7 @@ Events.updateAllPlayers = () => {
       }
     }
     connection.end();
-    console.log("info of all players (" + loggedPlayers + ") has been uploaded");
+    console.log("info of all players (" + loggedPlayers + ") has been updated");
   }
 };
 

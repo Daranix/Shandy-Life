@@ -25,16 +25,18 @@ class house {
 		this.price	  = price;
 	}
 
-	static enter(player, msg)
+	static enter(player)
 	{
-		msg = false || msg;
+		//msg = false || msg;
 		let index = house.inHouseEntrace(player);
 
 		if(index >= 0) {
 			if(HouseInfo[index].owner == player.info.id || HouseInfo[index].locked == 0) {
 				player.position = gm.utility.interiors[HouseInfo[index].interior].position;
+				player.dimension = HouseInfo[index].id; //index;
+				player.SendChatMessage("DIMENSION = " + player.dimension);
 			} else return player.SendChatMessage("This door is locked");
-		} else if(index < 0 && !msg) return player.SendChatMessage("You aren't in a house entrance");
+		} else return player.SendChatMessage("You aren't in a house entrance");
 	}
 
 	static inHouseEntrace(player)
@@ -46,6 +48,25 @@ class house {
 			}
 		}
 		return -1;
+	}
+
+	static inHouseExit(player) {
+		for(let i = 0; i < gm.utility.interiors.length; i++) {
+			let sphere = new gm.utility.sphere(gm.utility.interiors[i].position.x, gm.utility.interiors[i].position.y, gm.utility.interiors[i].position.z, 1.5);
+			if(sphere.inRangeOfPoint(player.position) && player.dimension >= 1) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	static exit(player) {
+		let interior = house.inHouseExit(player);
+		if(interior >= 0) {
+			let hindex = house.findHouseById(player.dimension);
+			player.position = HouseInfo[hindex].position;
+			player.dimension = 0;
+		} else return player.SendChatMessage("You're not on house exit.");
 	}
 
 	static sell(player) {
@@ -91,8 +112,14 @@ class house {
 				gm.utility.print("[HOUSES ERROR] ERROR: " + err);
 			}
 		});
-
 		connection.end();
+	}
+
+	static findHouseById(id) {
+		for(let i = 0; i < g_houses; i++) {
+			if(HouseInfo[i].id == id) return i;
+		}
+		return false;
 	}
 }
 
@@ -107,7 +134,7 @@ house.prototype.create = function() {
 		locked: 1
 	};
 
-	console.log("House created ID:" + this.id);
+	console.log("House created ID: " + this.id);
 	g_houses++;
 }
 

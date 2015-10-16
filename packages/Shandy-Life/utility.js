@@ -25,8 +25,9 @@ Utility.interiors = require('./interiors');
  * @param {RGB=} [opt_color] color of the message
  */
 Utility.broadcastMessage = (message, opt_color) => {
-  for (let player of gtamp.players) {
-    player.SendChatMessage(message, opt_color);
+  //for (let player of gtamp.players) {
+  for(let i = 0; i < gtamp.players.length; i++) {
+      gtamp.players[i].SendChatMessage(message, opt_color);
   }
 };
 
@@ -123,28 +124,31 @@ Utility.getAllArgs = function(args) {
 	return fullText;
 }
 
-Utility.RandomInt = (min, max) => {
+Utility.RandomInt = function(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-Utility.GetDistanceBetweenPoints = (x1, y1, z1, x2, y2, z2) => {
-	return parseFloat(parseFloat(Math.sqrt(Math.pow(Math.abs(x1 - x2),2)), Math.sqrt(Math.pow(Math.abs(y1 - y2), 2))), Math.sqrt(Math.pow(Math.abs(z1 - z2),2)))
-};
-
-Utility.GetPlayerDistanceToPoint = (player, x, y, z) => {
-	return Utility.GetDistanceBetweenPoints(player.position.x, player.position.y, player.position.z, x, y, z);
-};
-
-Utility.GetVehicleDistanceToPoint = (vehicle, x, y, z) => {
-	return Utility.GetDistanceBetweenPoints(vehicle.position.x, vehicle.position.y, vehicle.position.z, x, y, z);
+Utility.GetDistanceBetweenPoints = function(v1, v2) {
+  const dx = Math.abs(v1.x - v2.x);
+  const dy = Math.abs(v1.y - v2.y);
+  const dz = Math.abs(v1.z - v2.z);
+  return Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2) + Math.pow(dz, 2));
 }
 
-Utility.GetPlayerDistanceToVehicle = (player, vehicle) => {
-	return Utility.GetDistanceBetweenPoints(player.position.x, player.position.y, player.position.z, vehicle.position.x, vehicle.position.y, vehicle.position.z);
+Utility.GetPlayerDistanceToPoint = function(player, vector) {
+  return Utility.GetDistanceBetweenPoints(player.position, vector);
 }
 
-Utility.GetPlayerDistanceToPlayer = (player1, player2) => {
-	return Utility.GetDistanceBetweenPoints(player1.position.x, player1.position.y, player1.position.z, player2.position.x, player2.position.y, player2.position.z);
+Utility.GetVehicleDistanceToPoint = function(vehicle, vector) {
+  return Utility.GetDistanceBetweenPoints(vehicle.position, vector);
+}
+
+Utility.GetPlayerDistanceToVehicle = function(player, vehicle) {
+  return Utility.GetDistanceBetweenPoints(player.position, vehicle.position);
+}
+
+Utility.GetPlayerDistanceToPlayer = function(player1, player2) {
+  return Utility.GetDistanceBetweenPoints(player1.position, player2.position);
 }
 
 Utility.PlayerToPoint = (range, player, x, y, z) => {
@@ -225,38 +229,40 @@ Utility.unban = (player) => {
  * @param {RGB=} [opt_color] color of the message
  */
 
-Utility.groupMessage = (gid, message, opt_color) => {
+Utility.groupMessage = function(gid, message, opt_color) {
   //for (let player of gtamp.players) {
   for(let i = 0; i < gtamp.players.length; i++) {
 
   	if(gtamp.players[i].info.groupid == gid) {
-    	player.SendChatMessage(message, opt_color);
+    	gtamp.players[i].SendChatMessage(message, opt_color);
 	 }
   }
 };
 
-Utility.factionMessage = (faction, message, opt_color) => {
+Utility.factionMessage = function(faction, message, opt_color) {
   //for (let player of gtamp.players) {
   for(let i = 0; i < gtamp.players.length; i++) {
 
     if(gtamp.players[i].info.faction == faction) {
-      player.SendChatMessage(message, opt_color);
+      gtamp.players[i].SendChatMessage(message, opt_color);
    }
   }
 };
 
-Utility.adminMessage = (message, opt_color) => {
+Utility.adminMessage = function(message, opt_color) {
   for(let i = 0; i < gtamp.players.length; i++) {
   	if(gtamp.players[i].info.adminlvl >= 1) {
-    	player.SendChatMessage(message, opt_color);
+    	gtamp.players[i].SendChatMessage(message, opt_color);
 	 }
   }
 };
 
-Utility.proximityMessage = (radi, sender, message, opt_color) => {
-	for(let receptor of gtamp.players) {
-		if(Utility.PlayerToPoint(radi, receptor, sender.position.x, sender.position.y, sender.position.z)) {
-			receptor.SendChatMessage(message, opt_color);
+Utility.proximityMessage = function(radi, sender, message, opt_color) {
+	//for(let receptor of gtamp.players) {
+  for(let i = 0; i < gtamp.players.length; i++) {
+    let receiver = gtamp.players[i];
+		if(Utility.PlayerToPoint(radi, receiver, sender.position.x, sender.position.y, sender.position.z) && receiver.dimension == sender.dimension) {
+			receiver.SendChatMessage(message, opt_color);
 		}
 	}
 };

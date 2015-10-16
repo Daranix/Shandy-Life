@@ -51,7 +51,7 @@ class Group {
 	{
 		GroupInfo[gid].members.push(player.name);
 		GroupInfo[gid].membersrank.push(1);
-		PlayerInfo[player.name].groupid = GroupInfo[gid].id;
+		player.info.groupid = GroupInfo[gid].id;
 		Group.Update(gid);
 		gm.events.onPlayerUpdate(player);
 
@@ -62,7 +62,7 @@ class Group {
 	    	console.log("Adding the member");
 			GroupInfo[i].members.push(player.name);
 			GroupInfo[i].membersrank.push(1);
-			PlayerInfo[player.name].groupid = GroupInfo[i].id;
+			player.info.groupid = GroupInfo[i].id;
 
 
 
@@ -76,7 +76,7 @@ class Group {
 	}
 
 	static removemember(player) {
-		let indexGroup = Group.findById(PlayerInfo[player.name].groupid);
+		let indexGroup = Group.findById(player.info.groupid);
 		console.log("Indexgroup:" + indexGroup);
 		let index = GroupInfo[indexGroup].members.indexOf(player.name);
 
@@ -130,7 +130,7 @@ class Group {
 			Group.Update(indexGroup);
 		}
 
-		PlayerInfo[player.name].groupid = 0;
+		player.info.groupid = 0;
 		gm.events.onPlayerUpdate(player);
 		return true;
 	}
@@ -172,7 +172,7 @@ class Group {
 Group.prototype.create = function(player)
 {
 
-	 g_groups += 1; // Beacuse the default value for PlayerInfo[player.name].groupid its 0 and global.groups starts in 0
+	 g_groups += 1; // Beacuse the default value for player.info.groupid its 0 and global.groups starts in 0
 
 	 GroupInfo[g_groups] = {
 	  id: 0,
@@ -181,7 +181,7 @@ Group.prototype.create = function(player)
 	  membersrank: [7]
 	 };
 
-	 //PlayerInfo[player.name].groupid = g_groups;
+	 //player.info.groupid = g_groups;
 
 	// HERE WAS THE CONNECTION MYSQL to PUT INTO THE TABLE "GROUPS" THE INFO OF THE GROUP.
 	// u dont need to use JSON u can just GroupInfo[groups].members.toString();
@@ -212,12 +212,14 @@ Group.prototype.create = function(player)
 		if(err) return console.log("ERROR: " + err)
 		GroupInfo[g_groups].id = result[0].id;
 		player.SendChatMessage("GROUP ID: " + GroupInfo[g_groups].id);
-		PlayerInfo[player.name].groupid = result[0].id;
+		player.info.groupid = result[0].id;
+		gm.events.onPlayerUpdate(player);
+		//console.log("GROUPID CHANGED FOR PLAYER = ")
 	});
 
 	connection.end();
 
-	gm.events.onPlayerUpdate(player);
+	
 }
 
 module.exports = Group;

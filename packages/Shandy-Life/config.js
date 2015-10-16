@@ -39,7 +39,7 @@ module.exports = {
     host     : '192.168.0.200',
     user     : 'root',
     password : 'root',
-    database : 'roleplay',
+    database : 'roleplay2',
     salt     : 'QrTxL'
   }
 

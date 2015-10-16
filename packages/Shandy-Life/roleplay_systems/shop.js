@@ -50,7 +50,7 @@ class Shop {
 	    					let giveItem = new gm.rpsys.Item(item, quantity);
 	    					// Here add the shit of the price
 	    					giveItem.give(player);
-
+	    					player.SendChatMessage("You buy " + quantity + " " + item);
 	    					return true;
 	    					break;
 	    				}
@@ -73,6 +73,7 @@ class Shop {
     				let giveItem = new gm.rpsys.Item(itemString, quantity);
     				// Here add the shit of the price
     				giveItem.give(player);
+    				player.SendChatMessage("You buy " + quantity + " " + itemString);
     				return true;
     			}
     			
@@ -101,12 +102,12 @@ class Shop {
 
 	    				if(ShopInfo[i].items[c] == item) {
 
-	    					if(!gm.utility.isInArray(item, PlayerInventory[player.name].objects)) return player.SendChatMessage("You don't have that item!");
+	    					if(!gm.utility.isInArray(item, player.inventory.objects)) return player.SendChatMessage("You don't have that item!");
 
 	    					let sell_item = new gm.rpsys.Item(item, quantity);
 	    					// Here add the shit of the price
 	    					sell_item.remove(player);
-
+	    					player.SendChatMessage("You sell " + quantity + " " + item);
 	    					return true;
 	    					break;
 	    				}
@@ -127,10 +128,11 @@ class Shop {
 
     				//let giveItem = new Item(ShopInfo[i].items[itemVal], quantity);
     				let itemString = ShopInfo[i].items[itemVal];
-    				if(!gm.utility.isInArray(itemString, PlayerInventory[player.name].objects)) return player.SendChatMessage("You don't have that item!");
+    				if(!gm.utility.isInArray(itemString, player.inventory.objects)) return player.SendChatMessage("You don't have that item!");
     				//player.SendChatMessage(itemString)
     				let removeItem = new gm.rpsys.Item(itemString, quantity);
     				// Here add the shit of the price
+    				player.SendChatMessage("You sell " + quantity + " " + itemString);
     				removeItem.remove(player);
     				return true;
     			}
@@ -152,27 +154,6 @@ Shop.prototype.create = function() {
 	};
 
 	g_shops += 1;
-
 }
-
-/*module.exports.LoadShops = () => {
-	
-	console.log("Loading shops...");
-	let shop, position, items;
-
-	// 1 - 
-	items = ["apple", "orange", "kebab", "cocacola", "bannana", "rat", "lemon juice"];
-	position = new Vector3f(3360.19, -4849.67, 111.8);
-	shop = new system.Shop(position, items)
-	shop.create();
-
-	// 2 - 
-	items = ["shears", "wives", "explosive charge", "flanges keys"];
-	position = new Vector3f(-90.0, -2365.8, 14.3);
-	shop = new system.Shop(position, items)
-	shop.create();
-
-	console.log("Loaded " + g_shops + " shop(s)");
-}*/
 
 module.exports = Shop;

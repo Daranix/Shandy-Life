@@ -93,6 +93,7 @@ register("register", function(player, password) {
     player.ConfirmPwd = password;
     player.ConfirmReg = true;
     player.SendChatMessage("To confirm the password write again /register [password]");
+    connection.end();
   }
 
 });
@@ -213,7 +214,8 @@ register("hangon", function(player) {
     if(player.inCall == true && player.inCallNumber == player.info.phone)
     {
       player.inCall = true;
-      player.inCallNumber = PlayerInfo[caller.name].phone;
+      //player.inCallNumber = PlayerInfo[caller.name].phone;
+      player.inCallNumber = caller.info.phone;
       caller.SendChatMessage("the call has been answered");
       player.SendChatMessage("You hang on the call");
       clearInterval(TimerRing[player.name]);
@@ -262,7 +264,7 @@ register("group", function(player) {
 
         player.GroupInvite = '';
         //player.SendChatMessage("New member to de group: " + player.name);
-        gm.rpsys.groupMessage(player.info.groupid, "New member to the group: " + player.name, new RGB(255,255,255));
+        gm.utility.groupMessage(player.info.groupid, "New member to the group: " + player.name, new RGB(255,255,255));
         return player.SendChatMessage("Welcome to the group: " + gm.rpsys.Group.findNameById(player.info.groupid));
 
       }
@@ -273,8 +275,8 @@ register("group", function(player) {
 
         if(typeof player.GroupInvite === 'undefined' || player.GroupInvite == '') return player.SendChatMessage("You don't have a invitations to delince");
 
-        player.GroupInvite = '';
-        return player.SendChatMessage("You delinced the invitation to the group: " + GroupInfo[player.GroupInvite].name)
+        player.SendChatMessage("You delinced the invitation to the group: " + GroupInfo[player.GroupInvite].name);
+        return player.GroupInvite = '';
       }
 
       if(player.info.groupid == 0) {
@@ -474,6 +476,7 @@ register("shop", function(player) {
 
             gm.rpsys.Shop.buy(player, ShopInfo[i].items[itemIndex], quantity);
 
+            //player.SendChatMessage()
           }
           break;
         }
@@ -542,13 +545,13 @@ register("shop", function(player) {
 
 // FARM COMMAD
 
-register("farm", (player) => {
+register("farm", function(player) {
   gm.rpsys.farm.pick(player);
 });
 
 // HOUSE COMMAND
 
-register("house", (player, args) => {
+register("house", function(player) {
   let option = arguments[1];
 
   switch(option) {
@@ -556,7 +559,8 @@ register("house", (player, args) => {
     case 'buy': gm.rpsys.house.buy(player); break;
     case 'sell': gm.rpsys.house.sell(player); break;
     case 'enter': gm.rpsys.house.enter(player); break;
-    default: player.SendChatMessage("use: /house (enter/buy/sell)"); break;
+    case 'exit': gm.rpsys.house.exit(player); break;
+    default: player.SendChatMessage("use: /house (enter/exit/buy/sell)"); break;
   }
 });
 
