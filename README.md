@@ -6,6 +6,16 @@ If you have any questions try looking the [wiki](https://github.com/Daranix/Shan
 
 # Changelog
 
+### [0.7.3](github.com/Daranix/Shandy-Life/commit/b9bb3e6daf139e077c78e12b6edb1428a7f25645)
+
+- Bugfixes
+- Added exit function to house system, and implemented dimensions for the interiors
+
+### [0.7.2](github.com/Daranix/Shandy-Life/commit/b9bb3e6daf139e077c78e12b6edb1428a7f25645)
+
+- Bugfixes
+- Little performance improvements
+
 ### [0.7.1](github.com/Daranix/Shandy-Life/commit/b9bb3e6daf139e077c78e12b6edb1428a7f25645)
 
 - Shandy Life now works with STA 1.4!
