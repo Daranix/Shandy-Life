@@ -2,6 +2,14 @@
 
 Shandy Life is a early release of a gamemode roleplay for GTA:MP
 
+# ATTENTION
+
+The project has been discontinued since Take2 interactive gave notice to gta-mp.net to stop it
+
+[More info](https://www.change.org/p/vote-for-the-authorization-of-the-multiplayer-mod-gta-mp-for-gta-v)
+
+# ---------
+
 If you have any questions try looking the [wiki](https://github.com/Daranix/Shandy-Life/wiki)
 
 # Changelog
